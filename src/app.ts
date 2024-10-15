@@ -1,10 +1,14 @@
-import express, { Application } from 'express';
+import express from 'express';
 import routes from './presentation/routes';
+import cors from 'cors';
+import morgan from 'morgan';
 
-const app: Application = express();
+const app = express();
+app.use(cors())
 
 
 app.use('/api', routes); 
+app.use(morgan('dev'));
 
 
 app.use((err: any, req: any, res: any, next: any) => {
