@@ -1,5 +1,5 @@
 import express from 'express';
-import routes from './presentation/routes';
+import routes from './auth.module/presentation/routes';
 import cors from 'cors';
 import morgan from 'morgan';
 

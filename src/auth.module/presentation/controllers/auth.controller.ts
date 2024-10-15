@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { successResponse, errorResponse } from "../../shared/response.handler";
+import { successResponse, errorResponse } from "../../../shared/response.handler";
 import { loginCommand } from "../../application/commands/login.command";
 import { registerCommand } from "../../application/commands/register.command";
 
