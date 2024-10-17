@@ -1,19 +1,25 @@
+import 'reflect-metadata';
 import express from 'express';
-import routes from './presentation/routes';
+import { initializeContainer } from './shared/config/container.config'; 
+import orderRoutes from './order.module/presentation/routes/order.router';
+import authRoutes from './auth.module/presentation/routes/auth.router';
 import cors from 'cors';
 import morgan from 'morgan';
 
 const app = express();
-app.use(cors())
 
-
-app.use('/api', routes); 
+app.use(cors());
 app.use(morgan('dev'));
+app.use(express.json());
 
 
-app.use((err: any, req: any, res: any, next: any) => {
-  console.error(err.stack);
-  res.status(500).send('Something went wrong!');
+initializeContainer().then((container) => {
+
+  app.use('/api/orders', orderRoutes(container));
+  //app.use('/api/auth', authRoutes(container));
+
+}).catch((error) => {
+  console.error("Error initializing container:", error);
 });
 
-export default app;
+export default app
