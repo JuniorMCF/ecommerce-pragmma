@@ -13,13 +13,13 @@ export class CreateOrderCommand {
   }
 
   async execute(
-    clientId: string,
+    userId: string,
     paymentMethod: string,
     deliveryMethod: string,
     products: Product[]
   ): Promise<Order> {
     const orderDTO = new CreateOrderDto(
-      clientId,
+      userId,
       paymentMethod,
       deliveryMethod,
       products

@@ -7,7 +7,7 @@ import { CreateOrderCommand } from '../../order.module/application/commands/crea
 import { UpdateOrderCommand } from '../../order.module/application/commands/update-order.command';
 import { GetOrderByIdQuery } from '../../order.module/application/queries/get-order-by-id.query';
 import { DeleteOrderCommand } from '../../order.module/application/commands/delete-order-command';
-import { connectToDatabase } from "../../auth.module/infraestructure/database/Database"; // Si tienes una función para conectarte a la BD
+import { connectToDatabase } from "../../auth.module/infraestructure/database/Database"; 
 import { Db } from 'mongodb';
 import { OrderController } from '../../order.module/presentation/controllers/order.controller';
 
