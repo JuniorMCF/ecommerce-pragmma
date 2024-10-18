@@ -16,7 +16,7 @@ app.use(express.json());
 initializeContainer().then((container) => {
 
   app.use('/api/orders', orderRoutes(container));
-  //app.use('/api/auth', authRoutes(container));
+  app.use('/api/auth', authRoutes(container));
 
 }).catch((error) => {
   console.error("Error initializing container:", error);
