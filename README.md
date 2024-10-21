@@ -34,7 +34,7 @@ src/
 ├── app.ts                 # Archivo principal de configuración de Express
 ├── server.ts              # Punto de entrada de la aplicación
 └── migrations/            # Migraciones de MongoDB con migrate-mongo
-
+```
 
 ## 🚀 Requisitos Previos
 - **Node.js** (v14.x o superior)
