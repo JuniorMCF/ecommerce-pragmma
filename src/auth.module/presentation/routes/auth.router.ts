@@ -1,12 +1,17 @@
 import { Router } from 'express';
-import { login, register } from '../controllers/auth.controller';
+import { Container } from 'inversify';
+import { AuthController } from '../controllers/auth.controller';
 
-const router = Router();
+const authRoutes = (container: Container) => {
+  const router = Router();
+  const authController = container.get<AuthController>(AuthController);
 
-router.post('/login', login);
-router.post('/register', register);
-// router.post('/logout', logout);
-// router.get('/verify', verifyToken);
-// router.get('/profile', profile);
+  router.post('/register', authController.registerUser.bind(authController));
+  router.post('/login', authController.login.bind(authController));
+  router.get('/verify', authController.verifyToken.bind(authController));
+  // router.post('/logout', authController.registerUser.bind(authController));
+  // router.post('/profile', authController.registerUser.bind(authController));
+  return router;
+};
 
-export default router;
+export default authRoutes;

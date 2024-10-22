@@ -6,19 +6,24 @@ import authRoutes from './auth.module/presentation/routes/auth.router';
 import categoryRoutes from './categoy.module/presentation/routes/category.router'
 import cors from 'cors';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(cookieParser());
 
 
 initializeContainer().then((container) => {
 
   app.use('/api/orders', orderRoutes(container));
   app.use('/api/categories',categoryRoutes(container));
-  //app.use('/api/auth', authRoutes(container));
+  app.use('/api/auth', authRoutes(container));
 
 }).catch((error) => {
   console.error("Error initializing container:", error);
