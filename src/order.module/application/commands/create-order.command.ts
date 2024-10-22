@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { CreateOrderDto } from "../dtos/create-order.dto";
 import { OrderService } from "../services/order.service";
 import { Product } from "../../domain/entities/product";
@@ -6,11 +6,10 @@ import { Order } from "../../domain/entities/order";
 
 @injectable()
 export class CreateOrderCommand {
-  private orderService: OrderService;
 
-  constructor(orderService: OrderService) {
-    this.orderService = orderService;
-  }
+  constructor(
+    @inject(OrderService) private orderService:OrderService
+  ) {}
 
   async execute(
     userId: string,

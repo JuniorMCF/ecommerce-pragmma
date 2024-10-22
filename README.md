@@ -76,11 +76,6 @@ src/
     ```bash
     NODE_ENV=development
     SERVER_PORT=3000
-    DB_HOST=localhost
-    DB_PORT=3000
-    DB_USER=root
-    DB_PASSWORD=
-    DB_NAME=ecommerce
     MONGO_URL=mongodb://localhost:27017/ecommerce
     JWT_SECRET=
     ```

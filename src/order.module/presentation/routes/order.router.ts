@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { Container } from 'inversify';
 import { OrderController } from '../controllers/order.controller';
 
-const createOrderRoutes = (container: Container) => {
+const orderRoutes = (container: Container) => {
   const router = Router();
   
   // Resolver el controlador desde el contenedor
@@ -16,4 +16,4 @@ const createOrderRoutes = (container: Container) => {
   return router;
 };
 
-export default createOrderRoutes;
+export default orderRoutes;

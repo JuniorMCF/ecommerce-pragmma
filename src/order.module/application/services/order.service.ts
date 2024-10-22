@@ -4,11 +4,12 @@ import { Order, OrderBuilder } from "../../domain/entities/order";
 import { OrderDetailBuilder } from "../../domain/entities/order-detail";
 import { MongoOrderRepository } from "../../infraestructure/repositories/mongo-order.repository";
 import { UpdateOrderDto } from "../dtos/update-order.dto";
+import { IOrderRepository } from "../../domain/repositories/iorder.repository";
 
 @injectable()
 export class OrderService {
   constructor(
-    @inject(MongoOrderRepository) private orderRepository: MongoOrderRepository
+    @inject(MongoOrderRepository) private orderRepository: IOrderRepository
   ) {}
   async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
     const orderDetails = createOrderDto.products.map((product) => {

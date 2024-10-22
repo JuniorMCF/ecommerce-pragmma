@@ -1,8 +1,8 @@
-import { OrderRepository } from "../../domain/repositories/order.repository";
+import { IOrderRepository } from "../../domain/repositories/iorder.repository";
 import { Order, OrderBuilder } from "../../domain/entities/order";
 import { ObjectId, Db } from "mongodb"; // Importar Db
 
-export class MongoOrderRepository implements OrderRepository {
+export class MongoOrderRepository implements IOrderRepository {
   private collection;
 
   constructor(db: Db) {
