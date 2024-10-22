@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
 import AuthService from "../services/auth.service";
 import { User } from "../../domain/entities/user.entity";
-import { LoginUserDto } from "../dtos";
 import bcrypt from 'bcryptjs';
+import { createAccessToken } from "../../infraestructure/libs/jwt";
 
 @injectable()
 export class LoginCommand {
@@ -12,16 +12,19 @@ export class LoginCommand {
     this.authService = authService;
   }
 
-  async execute( email: string, password: string ): Promise<User | null> {
-    const userDTO = new LoginUserDto({ email, password });
-    const userSelected = await this.authService.findUserById(userDTO.email);
-    if(!userSelected) return null; //TODO: User not found, return
+  async execute(email: string, password: string): Promise<{ user: User | null; token: string | null }> {
+    const userSelected = await this.authService.existingUser(email);
 
-    const isMatch = await bcrypt.compare(password, userSelected.password);
-    if (!isMatch) {
-      return null; //TODO: deberia retornar un mensaje que el password es incorrect
+    if (!userSelected) {
+      return { user: null, token: null }; // User not found
     }
-    // todo: falta crear el token
-    return userSelected as User;
+
+    const passwordMatch = await bcrypt.compare(password, userSelected.password);
+    if (!passwordMatch) {
+      return { user: null, token: null }; // Incorrect Password
+    }
+
+    const token = await createAccessToken(userSelected.id);
+    return { user: userSelected, token: token as string };
   }
 }

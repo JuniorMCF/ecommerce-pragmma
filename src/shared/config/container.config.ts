@@ -15,6 +15,7 @@ import { MongoAuthRepository } from '../../auth.module/infraestructure/repositor
 import { RegisterUserCommand } from '../../auth.module/application/commands/register-user.command';
 import AuthService from '../../auth.module/application/services/auth.service';
 import { LoginCommand } from '../../auth.module/application/commands/login.command';
+import { VerifyTokenCommand } from '../../auth.module/application/commands/verify-token.command';
 
 
 const container = new Container();
@@ -35,6 +36,7 @@ export const initializeContainer = async (): Promise<Container> => {
   // Auth dependencies
   container.bind<RegisterUserCommand>(RegisterUserCommand).toSelf();
   container.bind<LoginCommand>(LoginCommand).toSelf();
+  container.bind<VerifyTokenCommand>(VerifyTokenCommand).toSelf();
   container.bind<AuthService>(AuthService).toSelf();
   container.bind<MongoAuthRepository>(MongoAuthRepository).toDynamicValue(() => new MongoAuthRepository(db));
 

@@ -8,8 +8,8 @@ const authRoutes = (container: Container) => {
 
   router.post('/register', authController.registerUser.bind(authController));
   router.post('/login', authController.login.bind(authController));
+  router.get('/verify', authController.verifyToken.bind(authController));
   // router.post('/logout', authController.registerUser.bind(authController));
-  // router.post('/verify', authController.registerUser.bind(authController));
   // router.post('/profile', authController.registerUser.bind(authController));
   return router;
 };

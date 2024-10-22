@@ -12,22 +12,12 @@ export class RegisterUserCommand {
     this.authService = authService;
   }
 
-  async execute(
-    name: string,
-    email: string,
-    password: string,
-  ): Promise<User> {
-    const passwordHashed = await  bcrypt.hash(password, 10); //#223hj4g234hgj23gh4
-    const userDTO = new CreateUserDto({
-      name,
-      email,
-      passwordHashed,
-    });
-
-    if (!email || !password) {
-      throw new Error("Email and password are required");
-    }
+  async execute( name: string, email: string, password: string, ): Promise<User | null> {
+    const existingUser = await this.authService.existingUser(email);
+    if (existingUser) return null;
     
+    const passwordHashed = await  bcrypt.hash(password, 10); //#223hj4g234hgj23gh4
+    const userDTO = new CreateUserDto({ name, email, passwordHashed,});
     return await this.authService.registerUser(userDTO);
   }
 }
