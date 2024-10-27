@@ -1,15 +1,21 @@
 import "reflect-metadata";
 import http from "http";
-import express from "express";
 import { Server as SocketIOServer } from "socket.io";
 import setupSocket from "./socket";
-import appConfig from "./core/config/app.config";
+import appConfig from "./config/app.config";
 import createServer from "./server";
+import { Container } from "inversify";
+import { appContainer } from "./containers/app.container";
+import apiRoutes from "./routes/routes";
+import ErrorMiddleware from "./middlewares/error.middleware";
+import NotFoundMiddleware from "./middlewares/notfound.middleware";
 
 (async () => {
   try {
     // Crear el servidor HTTP
-    const server = http.createServer();
+    const { app } = await createServer();
+
+    const server = http.createServer(app);
 
     // Configurar Socket.IO
     const io = new SocketIOServer(server, {
@@ -21,14 +27,16 @@ import createServer from "./server";
     });
     setupSocket(io);
 
-    // Crear la aplicación Express y el contenedor
-    const { app, container } = await createServer(io);
+    const container: Container = await appContainer(io);
 
-    // Montar la aplicación Express en el servidor HTTP
-    server.on("request", app);
+    // Rutas de la API
+    app.use("/api", apiRoutes(container));
 
-    // Iniciar el servidor HTTP/WebSocket
+    app.use(NotFoundMiddleware.handle);
+    app.use(ErrorMiddleware.handle);
+
     const httpPort: number = appConfig.port as number;
+
     server.listen(httpPort, () => {
       console.log(`Servidor corriendo en el puerto ${httpPort}`);
     });
