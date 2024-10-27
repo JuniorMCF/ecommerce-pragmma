@@ -4,7 +4,7 @@ Este proyecto es una API desarrollada en **Node.js** utilizando **TypeScript** p
 
 ## Descripción del Proyecto 📋
 
-El proyecto consiste en desarrollar una API utilizando NodeJS con Express y MongoDB como base de datos NoSQL. Esta aplicación permite a los usuarios seleccionar productos para su carrito de compras, autenticarse y enviar una orden al administrador el cual puede gestionar los productos que el cliente podra ver en la web.
+El proyecto consiste en desarrollar una API utilizando NodeJS con Express y MongoDB como base de datos NoSQL, tambien incluye SocketIO para las notificaciones en tiempo real. Esta aplicación permite a los usuarios seleccionar productos para su carrito de compras, autenticarse y enviar una orden al administrador el cual puede gestionar los productos que el cliente podra ver en la web.
 
 ## 📚 Funcionalidades
 
