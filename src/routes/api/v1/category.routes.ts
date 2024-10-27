@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { Container } from "inversify";
-import { CategoryController } from "../../controllers/api/category.controller";
-import { CategoryValidator } from "../../validations/category.validator";
-import { AuthMiddleware } from "../../middlewares/auth.middleware";
+import { CategoryController } from "../../../controllers/api/category.controller";
+import { CategoryValidator } from "../../../validations/category.validator";
+import { AuthMiddleware } from "../../../middlewares/auth.middleware";
 
 const categoryRoutes = (container: Container) => {
   const router = Router();

@@ -1,0 +1,683 @@
+openapi: 3.0.0
+info:
+  title: Ecommerce API
+  version: 1.0.0
+  description: Documentación de la API para el sistema de ecommerce con MongoDB
+servers:
+  - url: http://localhost:3000/api/v1
+paths:
+  /auth/register:
+    post:
+      summary: Registro de un nuevo usuario
+      tags:
+        - "Auth"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del usuario
+                email:
+                  type: string
+                  format: email
+                  description: Correo electrónico del usuario
+                password:
+                  type: string
+                  description: Contraseña del usuario
+      responses:
+        "201":
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID del usuario
+                  name:
+                    type: string
+                    description: Nombre del usuario
+                  email:
+                    type: string
+                    description: Correo electrónico del usuario
+        "409":
+          description: El correo electrónico ya está registrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+        "400":
+          description: Error al crear el usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+
+  /auth/login:
+    post:
+      summary: Inicio de sesión de un usuario
+      tags:
+        - "Auth"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Correo electrónico del usuario
+                password:
+                  type: string
+                  description: Contraseña del usuario
+      responses:
+        "200":
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID del usuario
+                  name:
+                    type: string
+                    description: Nombre del usuario
+                  email:
+                    type: string
+                    description: Correo electrónico del usuario
+                  token:
+                    type: string
+                    description: Token de autenticación
+        "400":
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+
+  /auth/verify:
+    get:
+      summary: Verificación del token de autenticación
+      tags:
+        - "Auth"
+      responses:
+        "200":
+          description: Token válido
+        "401":
+          description: Token inválido o no autorizado
+
+  /auth/logout:
+    post:
+      summary: Cierre de sesión del usuario
+      tags:
+        - "Auth"
+      responses:
+        "200":
+          description: Cierre de sesión exitoso
+        "401":
+          description: No autorizado
+  /categories:
+    post:
+      summary: Crear una nueva categoría
+      tags:
+        - "Categories"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                categoryName:
+                  type: string
+                  description: Nombre de la categoría
+      responses:
+        "201":
+          description: Categoría creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID de la categoría
+                  categoryName:
+                    type: string
+                    description: Nombre de la categoría
+        "400":
+          description: Error al crear la categoría
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+
+  /categories/{categoryId}:
+    put:
+      summary: Actualizar una categoría existente
+      tags:
+        - "Categories"
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: ID de la categoría
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                categoryName:
+                  type: string
+                  description: Nuevo nombre de la categoría
+      responses:
+        "200":
+          description: Categoría actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID de la categoría
+                  categoryName:
+                    type: string
+                    description: Nombre actualizado de la categoría
+        "404":
+          description: Categoría no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+        "400":
+          description: Error al actualizar la categoría
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+
+    get:
+      summary: Obtener información de una categoría
+      tags:
+        - "Categories"
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: ID de la categoría
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Categoría encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID de la categoría
+                  categoryName:
+                    type: string
+                    description: Nombre de la categoría
+        "404":
+          description: Categoría no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+
+    delete:
+      summary: Eliminar una categoría existente
+      tags:
+        - "Categories"
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: ID de la categoría
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Categoría eliminada exitosamente
+        "404":
+          description: Categoría no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+  /orders:
+    post:
+      summary: Crear una nueva orden
+      tags:
+        - "Orders"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: ID del usuario que realiza el pedido
+                paymentMethod:
+                  type: string
+                  description: Método de pago utilizado para la orden
+                deliveryMethod:
+                  type: string
+                  description: Método de entrega seleccionado
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: ID del producto
+                      quantity:
+                        type: integer
+                        description: Cantidad del producto
+                      price:
+                        type: number
+                        format: float
+                        description: Precio del producto
+      responses:
+        '201':
+          description: Orden creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID de la orden
+                  userId:
+                    type: string
+                    description: ID del usuario que realizó el pedido
+                  total:
+                    type: number
+                    format: float
+                    description: Total de la orden
+                  paymentMethod:
+                    type: string
+                    description: Método de pago
+                  deliveryMethod:
+                    type: string
+                    description: Método de entrega
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId:
+                          type: string
+                          description: ID del producto
+                        quantity:
+                          type: integer
+                          description: Cantidad del producto
+                        price:
+                          type: number
+                          format: float
+                          description: Precio del producto
+        '400':
+          description: Error al crear la orden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+
+  /orders/{orderId}:
+    get:
+      summary: Obtener una orden por ID
+      tags:
+        - "Orders"
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: ID de la orden que se desea obtener
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Orden encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID de la orden
+                  userId:
+                    type: string
+                    description: ID del usuario que realizó el pedido
+                  total:
+                    type: number
+                    format: float
+                    description: Total de la orden
+                  paymentMethod:
+                    type: string
+                    description: Método de pago
+                  deliveryMethod:
+                    type: string
+                    description: Método de entrega
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId:
+                          type: string
+                          description: ID del producto
+                        quantity:
+                          type: integer
+                          description: Cantidad del producto
+                        price:
+                          type: number
+                          format: float
+                          description: Precio del producto
+        '404':
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+
+    put:
+      summary: Actualizar una orden existente
+      tags:
+        - "Orders"
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: ID de la orden que se desea actualizar
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: ID del usuario que realiza el pedido
+                paymentMethod:
+                  type: string
+                  description: Método de pago utilizado para la orden
+                deliveryMethod:
+                  type: string
+                  description: Método de entrega seleccionado
+                status:
+                  type: string
+                  description: Estado de la orden
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: ID del producto
+                      quantity:
+                        type: integer
+                        description: Cantidad del producto
+                      price:
+                        type: number
+                        format: float
+                        description: Precio del producto
+      responses:
+        '200':
+          description: Orden actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: ID de la orden
+                  userId:
+                    type: string
+                    description: ID del usuario que realizó el pedido
+                  total:
+                    type: number
+                    format: float
+                    description: Total de la orden
+                  paymentMethod:
+                    type: string
+                    description: Método de pago
+                  deliveryMethod:
+                    type: string
+                    description: Método de entrega
+                  status:
+                    type: string
+                    description: Estado de la orden
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId:
+                          type: string
+                          description: ID del producto
+                        quantity:
+                          type: integer
+                          description: Cantidad del producto
+                        price:
+                          type: number
+                          format: float
+                          description: Precio del producto
+        '404':
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+
+    delete:
+      summary: Eliminar una orden
+      tags:
+        - "Orders"
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: ID de la orden que se desea eliminar
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Orden eliminada exitosamente
+        '404':
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
+  /products:
+    post:
+      summary: "Crear un nuevo producto"
+      tags:
+        - "Productos"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productName:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                  format: float
+                stock:
+                  type: integer
+                categoryId:
+                  type: string
+              required:
+                - productName
+                - price
+                - stock
+                - categoryId
+      responses:
+        '201':
+          description: "Producto creado con éxito"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: "Error en la creación del producto"
+
+    get:
+      summary: "Obtener todos los productos"
+      tags:
+        - "Productos"
+      responses:
+        '200':
+          description: "Lista de productos"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+
+  /products/{productId}:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        description: "ID del producto"
+        schema:
+          type: string
+
+    get:
+      summary: "Obtener un producto por ID"
+      tags:
+        - "Productos"
+      responses:
+        '200':
+          description: "Producto encontrado"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: "Producto no encontrado"
+
+    put:
+      summary: "Actualizar un producto existente"
+      tags:
+        - "Productos"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productName:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                  format: float
+                stock:
+                  type: integer
+                categoryId:
+                  type: string
+              required:
+                - productName
+                - price
+                - stock
+                - categoryId
+      responses:
+        '200':
+          description: "Producto actualizado con éxito"
+        '404':
+          description: "Producto no encontrado"
+
+    delete:
+      summary: "Eliminar un producto"
+      tags:
+        - "Productos"
+      responses:
+        '204':
+          description: "Producto eliminado con éxito"
+        '404':
+          description: "Producto no encontrado"

@@ -18,7 +18,7 @@ export class CategoryController extends BaseController {
     const { categoryName } = req.body;
 
     try {
-      const createResponse: ServiceResult<any> =
+      const createResponse: ServiceResult<Category> =
         await this.categoryService.createCategory(categoryName);
 
       if (createResponse.isSuccess) {
@@ -45,7 +45,7 @@ export class CategoryController extends BaseController {
     const { categoryName } = req.body;
 
     try {
-      const updateResponse: ServiceResult<any> =
+      const updateResponse: ServiceResult<Category> =
         await this.categoryService.updateCategory(categoryId, categoryName);
 
       if (updateResponse.isSuccess) {
@@ -71,7 +71,7 @@ export class CategoryController extends BaseController {
     const { categoryId } = req.params;
 
     try {
-      const categoryResponse: ServiceResult<any> =
+      const categoryResponse: ServiceResult<Category> =
         await this.categoryService.getCategoryById(categoryId);
 
       if (categoryResponse.isSuccess) {

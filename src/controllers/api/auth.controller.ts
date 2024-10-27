@@ -26,7 +26,9 @@ export class AuthController extends BaseController {
     const { email, password } = req.body;
     try {
       const signInUserDto = new SignInUserDTO(email, password);
-      const loginResponse: ServiceResult<User> = await this.authService.signIn(signInUserDto);
+      const loginResponse: ServiceResult<User> = await this.authService.signIn(
+        signInUserDto
+      );
 
       if (loginResponse.isSuccess) {
         return this.successResponse(
@@ -42,8 +44,8 @@ export class AuthController extends BaseController {
           loginResponse.status
         );
       }
-    } catch (error) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    } catch (error:any) {
+      throw new Error(error);
     }
   }
 
@@ -53,7 +55,8 @@ export class AuthController extends BaseController {
       const hashedPassword = await this.hashService.hash(password);
       const createUserDto = new CreateUserDto(name, email, hashedPassword);
 
-      const registerResponse: ServiceResult<User> = await this.authService.signUp(createUserDto);
+      const registerResponse: ServiceResult<User> =
+        await this.authService.signUp(createUserDto);
 
       if (registerResponse.isSuccess) {
         return this.successResponse(
@@ -69,8 +72,8 @@ export class AuthController extends BaseController {
           registerResponse.status
         );
       }
-    } catch (error) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 
@@ -86,8 +89,8 @@ export class AuthController extends BaseController {
         return this.errorResponse(res, "User not found, unauthorized", 401);
 
       return this.successResponse(res, null, "Token valid", 200);
-    } catch (error) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 
@@ -96,8 +99,8 @@ export class AuthController extends BaseController {
       res.clearCookie("token");
 
       return this.successResponse(res, null, "Logout successful", 200);
-    } catch (error) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 }
