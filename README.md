@@ -127,7 +127,6 @@ En el proyecto se implementaron los siguientes conceptos clave:
 12. **Documentación con Swagger**
     - Configuración de **Swagger** para documentar la API, facilitando a otros desarrolladores la comprensión y uso de los endpoints disponibles en el sistema.
 
-Estos conceptos conforman una arquitectura robusta y escalable, proporcionando una aplicación e-commerce organizada, segura y eficiente para sus usuarios.
 
 
 ## 👩🏻‍💻 Autores
