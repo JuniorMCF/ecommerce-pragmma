@@ -39,8 +39,8 @@ export class ProductController extends BaseController {
       } else {
         return this.errorResponse(res, response.message, response.status);
       }
-    } catch (error: any) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    } catch (error:any) {
+      throw new Error(error);
     }
   }
 
@@ -71,8 +71,8 @@ export class ProductController extends BaseController {
       } else {
         return this.errorResponse(res, response.message, response.status);
       }
-    } catch (error: any) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    }catch (error:any) {
+      throw new Error(error);
     }
   }
 
@@ -92,8 +92,8 @@ export class ProductController extends BaseController {
         response.message,
         response.status
       );
-    } catch (error: any) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    } catch (error:any) {
+      throw new Error(error);
     }
   }
 
@@ -113,8 +113,8 @@ export class ProductController extends BaseController {
         response.message,
         response.status
       );
-    } catch (error: any) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    } catch (error:any) {
+      throw new Error(error);
     }
   }
 
@@ -133,8 +133,8 @@ export class ProductController extends BaseController {
         response.message,
         response.status
       );
-    } catch (error: any) {
-      return this.errorResponse(res, "Internal Server Error", 500);
+    } catch (error:any) {
+      throw new Error(error);
     }
   }
 }
