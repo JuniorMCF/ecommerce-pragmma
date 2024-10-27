@@ -1,5 +1,5 @@
 import { Server as SocketIOServer } from "socket.io";
-import registerOrderEvents from "./core/events/order.event"; 
+import registerOrderEvents from "./events/order.event"; 
 
 const setupSocket = (io: SocketIOServer) => {
   io.on("connection", (socket) => {
