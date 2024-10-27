@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { Container } from "inversify";
-import ProductController from "../../controllers/api/product.controller";
-import { ProductValidator } from "../../validations/product.validator";
+import ProductController from "../../../controllers/api/product.controller";
+import { ProductValidator } from "../../../validations/product.validator";
 
 
 const productRoutes = (container: Container) => {

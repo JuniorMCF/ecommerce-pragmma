@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { Container } from "inversify";
-import { OrderController } from "../../controllers/api/order.controller";
-import { OrderValidator } from "../../validations/order.validator";
+import { OrderController } from "../../../controllers/api/order.controller";
+import { OrderValidator } from "../../../validations/order.validator";
 
 const orderRoutes = (container: Container) => {
   const router = Router();

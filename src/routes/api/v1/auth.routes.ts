@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { Container } from "inversify";
-import { AuthController } from "../../controllers/api/auth.controller";
-import { RegisterValidator } from "../../validations/register.validator";
-import { LoginValidator } from "../../validations/login.validator";
-import { AuthMiddleware } from "../../middlewares/auth.middleware";
+import { AuthController } from "../../../controllers/api/auth.controller";
+import { RegisterValidator } from "../../../validations/register.validator";
+import { LoginValidator } from "../../../validations/login.validator";
+import { AuthMiddleware } from "../../../middlewares/auth.middleware";
 
 const authRoutes = (container: Container) => {
   const router = Router();

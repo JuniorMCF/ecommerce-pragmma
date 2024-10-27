@@ -6,9 +6,10 @@ import appConfig from "./config/app.config";
 import createServer from "./server";
 import { Container } from "inversify";
 import { appContainer } from "./containers/app.container";
-import apiRoutes from "./routes/routes";
+import apiRoutesV1 from "./routes/api_v1.routes";
 import ErrorMiddleware from "./middlewares/error.middleware";
 import NotFoundMiddleware from "./middlewares/notfound.middleware";
+import setupSwagger from "./swagger/swagger";
 
 (async () => {
   try {
@@ -30,10 +31,13 @@ import NotFoundMiddleware from "./middlewares/notfound.middleware";
     const container: Container = await appContainer(io);
 
     // Rutas de la API
-    app.use("/api", apiRoutes(container));
+    app.use("/api/v1", apiRoutesV1(container));
 
-    app.use(NotFoundMiddleware.handle);
+    // config swagger for routes api
+    setupSwagger(app);
+
     app.use(ErrorMiddleware.handle);
+    app.use(NotFoundMiddleware.handle);
 
     const httpPort: number = appConfig.port as number;
 
