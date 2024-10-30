@@ -5,6 +5,7 @@ import categoryContainer from "./modules/category.container";
 import authContainer from "./modules/auth.container";
 import productContainer from "./modules/product.container";
 import { Server as SocketIoServer } from 'socket.io';
+import cartContainer from "./modules/cart.container";
 
 export const appContainer = async (io: SocketIoServer): Promise<Container> => {
   const container = new Container();
@@ -18,6 +19,7 @@ export const appContainer = async (io: SocketIoServer): Promise<Container> => {
     // Registrar contenedores 
     authContainer(container);
     orderContainer(container);
+    cartContainer(container)
     categoryContainer(container);
     productContainer(container);
   } catch (error) {

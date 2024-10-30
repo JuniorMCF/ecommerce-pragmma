@@ -1,13 +1,20 @@
 import { NextFunction, Request, Response } from "express";
 import { body, param, validationResult } from "express-validator";
 
+import {
+  fileSizeErrorMessage,
+  mimeTypeErrorMessage,
+  validateFileSize,
+  validateMimeType,
+} from "../utils/validations.utils";
+
 export class ProductValidator {
   public static async validateCreateProduct(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<any> {
-    // Validación para creación de producto
+    // Validación para campos de texto
     await body("productName")
       .exists()
       .withMessage("Product name is required.")
@@ -51,6 +58,25 @@ export class ProductValidator {
       .notEmpty()
       .withMessage("Category ID cannot be empty.")
       .run(req);
+
+    // Validación para el archivo
+    if (!req.file) {
+      return res.status(422).json({
+        errors: [{ msg: "Image file is required." }],
+      });
+    }
+
+    if (!validateMimeType(req.file, "images")) {
+      return res.status(422).json({
+        errors: [{ msg: mimeTypeErrorMessage("images") }],
+      });
+    }
+
+    if (!validateFileSize(req.file)) {
+      return res.status(422).json({
+        errors: [{ msg: fileSizeErrorMessage() }],
+      });
+    }
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -112,6 +138,21 @@ export class ProductValidator {
       .notEmpty()
       .withMessage("Category ID cannot be empty.")
       .run(req);
+
+    // Validación para el archivo, si está presente
+    if (req.file) {
+      if (!validateMimeType(req.file, "images")) {
+        return res.status(422).json({
+          errors: [{ msg: mimeTypeErrorMessage("images") }],
+        });
+      }
+
+      if (!validateFileSize(req.file)) {
+        return res.status(422).json({
+          errors: [{ msg: fileSizeErrorMessage() }],
+        });
+      }
+    }
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

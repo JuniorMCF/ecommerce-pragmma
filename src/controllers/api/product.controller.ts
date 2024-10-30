@@ -7,6 +7,7 @@ import { CreateProductDTO } from "../../dtos/create-product.dto";
 import { UpdateProductDTO } from "../../dtos/update-product.dto";
 import { ServiceResult } from "../../responses/service-result.dto";
 import { Product } from "../../entities/product";
+import Storage from "../../adapters/storage";
 
 @injectable()
 export class ProductController extends BaseController {
@@ -15,127 +16,101 @@ export class ProductController extends BaseController {
   }
 
   public async createProduct(req: Request, res: Response): Promise<void> {
-    try {
-      const { productName, description, price, stock, categoryId } = req.body;
+    const { productName, description, price, stock, categoryId } = req.body;
+    const imageFile = req.file;
 
-      const createProductDTO = new CreateProductDTO(
-        productName,
-        description,
-        price,
-        stock,
-        categoryId
-      );
+    const storage = Storage.disk("local");
 
-      const response: ServiceResult<Product> =
-        await this.productService.createProduct(createProductDTO);
+    const imageUrl = imageFile ? await storage.upload(imageFile) : undefined;
 
-      if (response.isSuccess) {
-        return this.successResponse(
-          res,
-          response.data,
-          response.message,
-          response.status
-        );
-      } else {
-        return this.errorResponse(res, response.message, response.status);
-      }
-    } catch (error:any) {
-      throw new Error(error);
-    }
+    const createProductDTO = new CreateProductDTO(
+      productName,
+      description,
+      price,
+      stock,
+      categoryId,
+      imageUrl
+    );
+
+    const response = await this.productService.createProduct(createProductDTO);
+
+    return response.isSuccess
+      ? this.successResponse(res, response.data, response.message)
+      : this.errorResponse(res, response.message, response.status);
   }
-
   public async updateProduct(req: Request, res: Response): Promise<void> {
-    try {
-      const { productId } = req.params;
-      const { productName, description, price, stock, categoryId } = req.body;
+    const { productId } = req.params;
+    const { productName, description, price, stock, categoryId } = req.body;
+    const imageFile = req.file;
 
-      const updateProductDTO = new UpdateProductDTO(
-        productId,
-        productName,
-        description,
-        price,
-        stock,
-        categoryId
-      );
+    const storage = Storage.disk("local");
+    let imageUrl: string | undefined;
 
-      const response: ServiceResult<Product> =
-        await this.productService.updateProduct(updateProductDTO);
+    // Obtener el producto actual para obtener la imagen anterior
+    const productResult: ServiceResult<Product> =
+      await this.productService.findById(productId);
 
-      if (response.isSuccess) {
-        return this.successResponse(
-          res,
-          response.data,
-          response.message,
-          response.status
-        );
-      } else {
-        return this.errorResponse(res, response.message, response.status);
-      }
-    }catch (error:any) {
-      throw new Error(error);
+    if (!productResult.isSuccess) {
+      this.errorResponse(res, productResult.message, productResult.status);
     }
-  }
 
+    const currentProduct = productResult.data as Product;
+
+    if (currentProduct.imageUrl && imageFile) {
+      await storage.delete(currentProduct.imageUrl);
+    }
+
+    // Subir y asignar la nueva imagen solo si se proporciona una nueva
+    imageUrl = imageFile
+      ? await storage.upload(imageFile)
+      : currentProduct.imageUrl;
+
+    // Solo incluye imageUrl si hay una nueva imagen para actualizar
+    const updateProductDTO = new UpdateProductDTO(
+      productId,
+      productName,
+      description,
+      price,
+      stock,
+      categoryId,
+      imageUrl
+    );
+
+    const response = await this.productService.updateProduct(updateProductDTO);
+
+    return response.isSuccess
+      ? this.successResponse(res, response.data, response.message)
+      : this.errorResponse(res, response.message, response.status);
+  }
   public async getProduct(req: Request, res: Response): Promise<void> {
     const { productId } = req.params;
 
-    try {
-      const response: ServiceResult<Product> =
-        await this.productService.findProductById(productId);
+    const response: ServiceResult<Product> =
+      await this.productService.findById(productId);
 
-      if (!response.isSuccess) {
-        return this.errorResponse(res, response.message, response.status);
-      }
-      return this.successResponse(
-        res,
-        response.data,
-        response.message,
-        response.status
-      );
-    } catch (error:any) {
-      throw new Error(error);
-    }
+    return response.isSuccess
+      ? this.successResponse(res, response.data, response.message)
+      : this.errorResponse(res, response.message, response.status);
   }
 
   public async deleteProduct(req: Request, res: Response): Promise<void> {
     const { productId } = req.params;
 
-    try {
-      const response: ServiceResult<Product> =
-        await this.productService.deleteProduct(productId);
+    const response: ServiceResult<Product> =
+      await this.productService.deleteProduct(productId);
 
-      if (!response.isSuccess) {
-        return this.errorResponse(res, response.message, response.status);
-      }
-      return this.successResponse(
-        res,
-        response.data,
-        response.message,
-        response.status
-      );
-    } catch (error:any) {
-      throw new Error(error);
-    }
+    return response.isSuccess
+      ? this.successResponse(res, response.data, response.message)
+      : this.errorResponse(res, response.message, response.status);
   }
 
   public async allProduct(req: Request, res: Response): Promise<void> {
-    try {
-      const response: ServiceResult<Product[]> =
-        await this.productService.allProducts();
+    const response: ServiceResult<Product[]> =
+      await this.productService.allProducts();
 
-      if (!response.isSuccess) {
-        return this.errorResponse(res, response.message, response.status);
-      }
-
-      return this.successResponse(
-        res,
-        response.data,
-        response.message,
-        response.status
-      );
-    } catch (error:any) {
-      throw new Error(error);
-    }
+    return response.isSuccess
+      ? this.successResponse(res, response.data, response.message)
+      : this.errorResponse(res, response.message, response.status);
   }
 }
 

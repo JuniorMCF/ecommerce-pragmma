@@ -58,6 +58,16 @@ El proyecto consiste en desarrollar una API utilizando NodeJS con Express y Mong
      NAME_DATABASE='pragmma-ecommerce-db'
      JWT_ACCESS_SECRET=<tu_secreto_jwt>
      JWT_EXPIRATION=1h
+
+     STORAGE_DISK=local
+     LOCAL_STORAGE_PATH=./uploads
+     MAX_FILE_SIZE_MB=5
+
+
+     AWS_BUCKET_NAME=
+     AWS_REGION=us-east-1
+     AWS_ACCESS_KEY_ID=
+     AWS_SECRET_ACCESS_KEY=
      ```
 
 5. **Instalar Dependencias**

@@ -1,4 +1,4 @@
-import { ObjectId, Db } from "mongodb"; 
+import { ObjectId, Db } from "mongodb";
 import { ICategoryRepository } from "../contracts/repositories/icategory.repository";
 import { Category } from "../entities/category";
 import { injectable, inject } from "inversify";
@@ -7,11 +7,10 @@ import { injectable, inject } from "inversify";
 @injectable()
 export class CategoryRepository implements ICategoryRepository {
   private collection;
-
   constructor(
-    @inject(Db) private db: Db,
-    /* @inject(SocketIoServer) private io: SocketIoServer */
-  ) {
+    @inject(Db) private db: Db
+  ) /* @inject(SocketIoServer) private io: SocketIoServer */
+  {
     this.collection = this.db.collection("categories");
   }
 
@@ -73,5 +72,18 @@ export class CategoryRepository implements ICategoryRepository {
     await this.collection.deleteOne({ _id: new ObjectId(categoryId) });
 
     return true;
+  }
+  async findAll(): Promise<Category[]> {
+    const result = await this.collection.find().toArray();
+
+    const categories: Category[] = result.map(
+      (doc) =>
+        new Category({
+          id: doc._id.toString(),
+          categoryName: doc.categoryName,
+        })
+    );
+
+    return categories;
   }
 }

@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { ITokenService } from "../contracts/services/itoken.service";
 import { injectable } from "inversify";
+import { User } from "../entities/user";
 
 @injectable()
 export class TokenService implements ITokenService {
@@ -13,18 +14,20 @@ export class TokenService implements ITokenService {
   }
 
   generateToken(userId: string): string {
-    const token = jwt.sign({ id: userId }, this.secretKey, {
-      expiresIn: this.expiresIn,
-    });
-    return token;
+    return jwt.sign({ id: userId }, this.secretKey, { expiresIn: this.expiresIn });
   }
 
-  verifyToken(token: string): any {
+  verifyToken(token: string): User | undefined {
     try {
-      const decoded = jwt.verify(token, this.secretKey);
-      return decoded;
+      const decoded = jwt.verify(token, this.secretKey) as jwt.JwtPayload;
+      
+      if (decoded && decoded.id) {
+        // Retorna una instancia de User con solo el id
+        return new User({ id: decoded.id });
+      }
+      return undefined;
     } catch (error) {
-      return null;
+      return undefined;
     }
   }
 }

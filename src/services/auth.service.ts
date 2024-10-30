@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { AuthRepository } from "../repositories/auth.repository";
-import { User } from "../entities/user.model";
+import { User } from "../entities/user";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { IAuthRepository } from "../contracts/repositories/iauth.repository";
 import { IAuthService } from "../contracts/services/iauth.service";
@@ -19,7 +19,7 @@ export class AuthService implements IAuthService {
     @inject(TokenService) private tokenService: ITokenService
   ) {}
   async signIn(dto: SignInUserDTO): Promise<ServiceResult<User>> {
-    const foundUser = await this.authRepository.findByEmail(dto.email);
+    const foundUser = await this.authRepository.findByEmailWithPassword(dto.email);
 
     if (!foundUser) {
       return ServiceResult.failure<User>("Invalid email or password","INVALID_CREDENTIALS",400);

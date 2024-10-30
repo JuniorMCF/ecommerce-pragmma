@@ -5,6 +5,7 @@ export class Product {
   price: number;
   stock?: number;
   categoryId?:string;
+  imageUrl?:string;
 
   constructor(data: Partial<Product>) {
     this.productName = data.productName!;
@@ -13,5 +14,6 @@ export class Product {
     this.stock = data.stock;
     this.id = data.id;
     this.categoryId = data.categoryId
+    this.imageUrl = data.imageUrl
   }
 }

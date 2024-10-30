@@ -4,6 +4,7 @@ import { AuthController } from "../../../controllers/api/auth.controller";
 import { RegisterValidator } from "../../../validations/register.validator";
 import { LoginValidator } from "../../../validations/login.validator";
 import { AuthMiddleware } from "../../../middlewares/auth.middleware";
+import { catchAsync } from "../../../utils/catch-async";
 
 const authRoutes = (container: Container) => {
   const router = Router();
@@ -12,23 +13,23 @@ const authRoutes = (container: Container) => {
   router.post(
     "/auth/register",
     RegisterValidator.validateRegister,
-    authController.registerUser.bind(authController)
+    catchAsync(authController.registerUser.bind(authController))
   );
   router.post(
     "/auth/login",
     LoginValidator.validateLogin,
-    authController.login.bind(authController)
+    catchAsync(authController.login.bind(authController))
   );
   router.get(
     "/auth/verify",
     AuthMiddleware.validateAndVerifyToken,
-    authController.verifyToken.bind(authController)
+    catchAsync(authController.verifyToken.bind(authController))
   );
 
   router.post(
     "/auth/logout",
     AuthMiddleware.validateAndVerifyToken,
-    authController.logout.bind(authController)
+    catchAsync(authController.logout.bind(authController))
   );
   // router.post('/profile', authController.registerUser.bind(authController));
   return router;
