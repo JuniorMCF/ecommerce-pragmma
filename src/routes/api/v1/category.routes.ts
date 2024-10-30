@@ -3,6 +3,7 @@ import { Container } from "inversify";
 import { CategoryController } from "../../../controllers/api/category.controller";
 import { CategoryValidator } from "../../../validations/category.validator";
 import { AuthMiddleware } from "../../../middlewares/auth.middleware";
+import { catchAsync } from "../../../utils/catch-async";
 
 const categoryRoutes = (container: Container) => {
   const router = Router();
@@ -10,12 +11,23 @@ const categoryRoutes = (container: Container) => {
   const categoryController =
     container.get<CategoryController>(CategoryController);
 
+
+  router.get(
+    "/categories/all",
+    catchAsync(categoryController.allCategories.bind(categoryController))
+  );
+
+  router.get(
+    "/categories/:categoryId/products",
+    CategoryValidator.validateCategoryId,
+    catchAsync(categoryController.productsByCategory.bind(categoryController))
+  );
   router.post(
     "/categories",
     AuthMiddleware.validateAndVerifyToken,
     CategoryValidator.validateCreateCategory,
 
-    categoryController.createCategory.bind(categoryController)
+    catchAsync(categoryController.createCategory.bind(categoryController))
   );
 
   router.put(
@@ -23,7 +35,7 @@ const categoryRoutes = (container: Container) => {
     AuthMiddleware.validateAndVerifyToken,
     CategoryValidator.validateUpdateCategory,
 
-    categoryController.updateCategory.bind(categoryController)
+    catchAsync(categoryController.updateCategory.bind(categoryController))
   );
 
   router.get(
@@ -31,7 +43,7 @@ const categoryRoutes = (container: Container) => {
     AuthMiddleware.validateAndVerifyToken,
     CategoryValidator.validateCategoryId,
 
-    categoryController.getCategory.bind(categoryController)
+    catchAsync(categoryController.getCategory.bind(categoryController))
   );
 
   router.delete(
@@ -39,7 +51,7 @@ const categoryRoutes = (container: Container) => {
     AuthMiddleware.validateAndVerifyToken,
     CategoryValidator.validateCategoryId,
 
-    categoryController.deleteCategory.bind(categoryController)
+    catchAsync(categoryController.deleteCategory.bind(categoryController))
   );
 
   return router;

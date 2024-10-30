@@ -1,6 +1,6 @@
 import { ObjectId, Db } from "mongodb"; // Importar Db
 import { IAuthRepository } from "../contracts/repositories/iauth.repository";
-import { User } from "../entities/user.model";
+import { User } from "../entities/user";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { inject, injectable } from "inversify";
 /* import { Server as SocketIoServer } from "socket.io"; */
@@ -10,9 +10,9 @@ export class AuthRepository implements IAuthRepository {
   private collection;
 
   constructor(
-    @inject(Db) private db: Db
-  ) /*     @inject(SocketIoServer) private io: SocketIoServer */
-  {
+    @inject(Db)
+    private db: Db /*     @inject(SocketIoServer) private io: SocketIoServer */
+  ) {
     this.collection = this.db.collection("users");
   }
 
@@ -21,7 +21,9 @@ export class AuthRepository implements IAuthRepository {
       name: user.name,
       email: user.email,
       password: user.passwordHashed,
+      role: user.role,
       createdAt: new Date(),
+      updatedAt: new Date(),
     };
     const result = await this.collection.insertOne(newUser);
 
@@ -29,6 +31,9 @@ export class AuthRepository implements IAuthRepository {
       id: result.insertedId.toString(),
       name: newUser.name,
       email: newUser.email,
+      role:newUser.role,
+      createdAt:newUser.createdAt,
+      updatedAt:newUser.updatedAt,
     });
   }
 
@@ -50,6 +55,18 @@ export class AuthRepository implements IAuthRepository {
           id: user._id?.toString(),
           name: user.name,
           email: user.email,
+        })
+      : undefined;
+  }
+
+  async findByEmailWithPassword(email: string): Promise<User | undefined> {
+    const user = await this.collection.findOne({ email: email });
+    return user
+      ? new User({
+          id: user._id?.toString(),
+          name: user.name,
+          email: user.email,
+          password:user.password,
         })
       : undefined;
   }

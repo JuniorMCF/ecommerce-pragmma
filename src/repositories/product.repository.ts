@@ -27,7 +27,26 @@ export class ProductRepository implements IProductRepository {
       price: result.price,
       stock: result.stock,
       categoryId: result.categoryId,
+      imageUrl: result.imageUrl,
     });
+  }
+  async findByCategoryId(categoryId: string): Promise<Product[]> {
+    const result = await this.collection.find({ categoryId }).toArray();
+
+    const products: Product[] = result.map(
+      (doc) =>
+        new Product({
+          id: doc._id.toString(),
+          productName: doc.productName,
+          description: doc.description,
+          price: doc.price,
+          stock: doc.stock,
+          categoryId: doc.categoryId,
+          imageUrl: doc.imageUrl,
+        })
+    );
+
+    return products;
   }
   async create(product: Product): Promise<Product | undefined> {
     const newProduct = {
@@ -36,6 +55,7 @@ export class ProductRepository implements IProductRepository {
       stock: product.stock,
       price: product.price,
       categoryId: product.categoryId,
+      imageUrl: product.imageUrl,
     };
 
     const result = await this.collection.insertOne(newProduct);
@@ -52,6 +72,7 @@ export class ProductRepository implements IProductRepository {
       stock: product.stock,
       price: product.price,
       categoryId: product.categoryId,
+      imageUrl: product.imageUrl,
     };
     await this.collection.updateOne(
       { _id: new ObjectId(product.id) },
@@ -89,9 +110,25 @@ export class ProductRepository implements IProductRepository {
           price: doc.price,
           stock: doc.stock,
           categoryId: doc.categoryId,
+          imageUrl: doc.imageUrl,
         })
     );
 
     return products;
+  }
+
+  async findByName(productName: string): Promise<Product | undefined> {
+    const result = await this.collection.findOne({ productName });
+    if (!result) return undefined;
+
+    return new Product({
+      id: result._id.toString(),
+      productName: result.productName,
+      description: result.description,
+      price: result.price,
+      stock: result.stock,
+      categoryId: result.categoryId,
+      imageUrl: result.imageUrl,
+    });
   }
 }

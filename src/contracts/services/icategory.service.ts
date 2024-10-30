@@ -7,6 +7,7 @@ export interface ICategoryService {
     id: string,
     categoryName: string
   ): Promise<ServiceResult<Category>>;
-  getCategoryById(id: string): Promise<ServiceResult<Category>>;
+  findById(id: string): Promise<ServiceResult<Category>>;
   deleteCategory(id: string): Promise<ServiceResult<Category>>;
+  allCategories(): Promise<ServiceResult<Category[]>>;
 }

@@ -1,37 +1,24 @@
+// AuthMiddleware.ts
 import { Request, Response, NextFunction } from "express";
-import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
-import { cookie } from "express-validator";
 
 export class AuthMiddleware {
-  public static async validateAndVerifyToken(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<any> {
-    await cookie("token")
-      .exists()
-      .withMessage("Token is required.")
-      .isJWT()
-      .withMessage("Token is invalid.")
-      .run(req);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(401).json({ errors: errors.array() });
-    }
-
-    const token = req.cookies.token;
+  public static async validateAndVerifyToken(req: Request, res: Response, next: NextFunction): Promise<any> {
+    const authHeader = req.headers.authorization;
     const secretKey = process.env.JWT_ACCESS_SECRET || "";
 
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ errors: [{ msg: "Authorization token is required." }] });
+    }
+
+    const token = authHeader.split(" ")[1];
+
     try {
-      const decoded = jwt.verify(token, secretKey);
-      (req as any).user = decoded;
+      const decoded = jwt.verify(token, secretKey) as { id: string };
+      req.body.user = { id: decoded.id };
       next();
     } catch (error) {
-      return res
-        .status(401)
-        .json({ errors: [{ msg: "Invalid or expired token" }] });
+      return res.status(401).json({ errors: [{ msg: "Invalid or expired token" }] });
     }
   }
 }

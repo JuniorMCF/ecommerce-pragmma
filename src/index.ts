@@ -7,9 +7,12 @@ import createServer from "./server";
 import { Container } from "inversify";
 import { appContainer } from "./containers/app.container";
 import apiRoutesV1 from "./routes/api_v1.routes";
-import ErrorMiddleware from "./middlewares/error.middleware";
 import NotFoundMiddleware from "./middlewares/notfound.middleware";
 import setupSwagger from "./swagger/swagger";
+import ErrorMiddleware from "./middlewares/error.middleware";
+import AppProvider from "./providers/service.provider";
+
+AppProvider.register();
 
 (async () => {
   try {
@@ -36,7 +39,8 @@ import setupSwagger from "./swagger/swagger";
     // config swagger for routes api
     setupSwagger(app);
 
-    app.use(ErrorMiddleware.handle);
+    app.use(ErrorMiddleware.errorConverter);
+    app.use(ErrorMiddleware.errorHandler);
     app.use(NotFoundMiddleware.handle);
 
     const httpPort: number = appConfig.port as number;

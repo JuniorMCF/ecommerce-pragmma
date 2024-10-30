@@ -5,6 +5,7 @@ export class UpdateProductDTO {
   price: number;
   stock: number;
   categoryId: string;
+  imageUrl?: string;
 
   constructor(
     id: string,
@@ -12,7 +13,8 @@ export class UpdateProductDTO {
     description: string,
     price: number,
     stock: number,
-    categoryId: string
+    categoryId: string,
+    imageUrl?: string
   ) {
     this.id = id;
     this.productName = productName;
@@ -20,5 +22,6 @@ export class UpdateProductDTO {
     this.price = price;
     this.stock = stock;
     this.categoryId = categoryId;
+    this.imageUrl = imageUrl;
   }
 }

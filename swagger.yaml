@@ -2,15 +2,16 @@ openapi: 3.0.0
 info:
   title: Ecommerce API
   version: 1.0.0
-  description: Documentación de la API para el sistema de ecommerce con MongoDB
+  description: API de autenticación para un sistema de ecommerce con manejo de tokens JWT en cookies
 servers:
   - url: http://localhost:3000/api/v1
+
 paths:
   /auth/register:
     post:
       summary: Registro de un nuevo usuario
       tags:
-        - "Auth"
+        - Auth
       requestBody:
         required: true
         content:
@@ -45,6 +46,9 @@ paths:
                   email:
                     type: string
                     description: Correo electrónico del usuario
+                  message:
+                    type: string
+                    description: Mensaje de éxito
         "409":
           description: El correo electrónico ya está registrado
           content:
@@ -70,7 +74,7 @@ paths:
     post:
       summary: Inicio de sesión de un usuario
       tags:
-        - "Auth"
+        - Auth
       requestBody:
         required: true
         content:
@@ -105,6 +109,9 @@ paths:
                   token:
                     type: string
                     description: Token de autenticación
+                  message:
+                    type: string
+                    description: Mensaje de éxito
         "400":
           description: Credenciales inválidas
           content:
@@ -120,28 +127,75 @@ paths:
     get:
       summary: Verificación del token de autenticación
       tags:
-        - "Auth"
+        - Auth
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Token válido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: ID del usuario
+                      email:
+                        type: string
+                        description: Correo electrónico del usuario
+                  message:
+                    type: string
+                    description: "Token válido"
         "401":
           description: Token inválido o no autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error
 
   /auth/logout:
     post:
       summary: Cierre de sesión del usuario
       tags:
-        - "Auth"
+        - Auth
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Cierre de sesión exitoso
-        "401":
-          description: No autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de éxito de cierre de sesión
+        "404":
+          description: Token no encontrado en cookies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Mensaje de error indicando que no se encontró el token
   /categories:
     post:
       summary: Crear una nueva categoría
       tags:
-        - "Categories"
+        - Categories
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -166,6 +220,9 @@ paths:
                   categoryName:
                     type: string
                     description: Nombre de la categoría
+                  message:
+                    type: string
+                    description: Mensaje de éxito
         "400":
           description: Error al crear la categoría
           content:
@@ -181,14 +238,16 @@ paths:
     put:
       summary: Actualizar una categoría existente
       tags:
-        - "Categories"
+        - Categories
+      security:
+        - bearerAuth: []
       parameters:
         - name: categoryId
           in: path
           required: true
-          description: ID de la categoría
           schema:
             type: string
+          description: ID de la categoría a actualizar
       requestBody:
         required: true
         content:
@@ -198,7 +257,7 @@ paths:
               properties:
                 categoryName:
                   type: string
-                  description: Nuevo nombre de la categoría
+                  description: Nombre actualizado de la categoría
       responses:
         "200":
           description: Categoría actualizada exitosamente
@@ -213,6 +272,9 @@ paths:
                   categoryName:
                     type: string
                     description: Nombre actualizado de la categoría
+                  message:
+                    type: string
+                    description: Mensaje de éxito
         "404":
           description: Categoría no encontrada
           content:
@@ -237,14 +299,16 @@ paths:
     get:
       summary: Obtener información de una categoría
       tags:
-        - "Categories"
+        - Categories
+      security:
+        - bearerAuth: []
       parameters:
         - name: categoryId
           in: path
           required: true
-          description: ID de la categoría
           schema:
             type: string
+          description: ID de la categoría a obtener
       responses:
         "200":
           description: Categoría encontrada
@@ -259,6 +323,9 @@ paths:
                   categoryName:
                     type: string
                     description: Nombre de la categoría
+                  message:
+                    type: string
+                    description: Mensaje de éxito
         "404":
           description: Categoría no encontrada
           content:
@@ -273,14 +340,16 @@ paths:
     delete:
       summary: Eliminar una categoría existente
       tags:
-        - "Categories"
+        - Categories
+      security:
+        - bearerAuth: []
       parameters:
         - name: categoryId
           in: path
           required: true
-          description: ID de la categoría
           schema:
             type: string
+          description: ID de la categoría a eliminar
       responses:
         "204":
           description: Categoría eliminada exitosamente
@@ -294,45 +363,37 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-  /orders:
-    post:
-      summary: Crear una nueva orden
+  /categories/all:
+    get:
+      summary: Obtener todas las categorias
       tags:
-        - "Orders"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userId:
-                  type: string
-                  description: ID del usuario que realiza el pedido
-                paymentMethod:
-                  type: string
-                  description: Método de pago utilizado para la orden
-                deliveryMethod:
-                  type: string
-                  description: Método de entrega seleccionado
-                products:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        description: ID del producto
-                      quantity:
-                        type: integer
-                        description: Cantidad del producto
-                      price:
-                        type: number
-                        format: float
-                        description: Precio del producto
+        - "Categories"
       responses:
-        '201':
-          description: Orden creada exitosamente
+        "200":
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+
+  /categories/{categoryId}/products:
+    get:
+      summary: Get products by category
+      description: Retrieve a category by its ID and return all products associated with it.
+      tags:
+        - Categories
+      parameters:
+        - in: path
+          name: categoryId
+          required: true
+          schema:
+            type: string
+          description: ID of the category to retrieve products for
+      responses:
+        '200':
+          description: Successful response with category and associated products
           content:
             application/json:
               schema:
@@ -340,37 +401,100 @@ paths:
                 properties:
                   id:
                     type: string
-                    description: ID de la orden
-                  userId:
+                    description: ID of the category
+                    example: "64b8a0e12ab5f2c38c24db47"
+                  categoryName:
                     type: string
-                    description: ID del usuario que realizó el pedido
-                  total:
-                    type: number
-                    format: float
-                    description: Total de la orden
-                  paymentMethod:
-                    type: string
-                    description: Método de pago
-                  deliveryMethod:
-                    type: string
-                    description: Método de entrega
+                    description: Name of the category
+                    example: "Electronics"
                   products:
                     type: array
                     items:
                       type: object
                       properties:
-                        productId:
+                        id:
                           type: string
-                          description: ID del producto
-                        quantity:
-                          type: integer
-                          description: Cantidad del producto
+                          description: Product ID
+                          example: "64c6a2f34e5f13f57d0b2f68"
+                        name:
+                          type: string
+                          description: Name of the product
+                          example: "Smartphone"
                         price:
                           type: number
-                          format: float
-                          description: Precio del producto
-        '400':
-          description: Error al crear la orden
+                          description: Price of the product
+                          example: 299.99
+        '404':
+          description: Category or products not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Category not found"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"
+  /products:
+    post:
+      summary: Crear un nuevo producto
+      tags:
+        - "Products"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                productName:
+                  type: string
+                  description: Nombre del producto
+                description:
+                  type: string
+                  description: Descripción del producto
+                price:
+                  type: number
+                  format: float
+                  description: Precio del producto
+                stock:
+                  type: integer
+                  description: Cantidad en inventario
+                file:
+                  type: string
+                  format: binary
+                  description: Archivo de imagen
+                categoryId:
+                  type: string
+                  description: ID de la categoría
+                
+              required:
+                - productName
+                - description
+                - price
+                - stock
+                - file
+                - categoryId
+      responses:
+        "201":
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          description: Error al crear el producto
           content:
             application/json:
               schema:
@@ -380,59 +504,27 @@ paths:
                     type: string
                     description: Mensaje de error
 
-  /orders/{orderId}:
+  /products/{productId}:
     get:
-      summary: Obtener una orden por ID
+      summary: Obtener un producto por ID
       tags:
-        - "Orders"
+        - "Products"
       parameters:
-        - name: orderId
+        - name: productId
           in: path
           required: true
-          description: ID de la orden que se desea obtener
+          description: ID del producto
           schema:
             type: string
       responses:
-        '200':
-          description: Orden encontrada
+        "200":
+          description: Producto encontrado
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: ID de la orden
-                  userId:
-                    type: string
-                    description: ID del usuario que realizó el pedido
-                  total:
-                    type: number
-                    format: float
-                    description: Total de la orden
-                  paymentMethod:
-                    type: string
-                    description: Método de pago
-                  deliveryMethod:
-                    type: string
-                    description: Método de entrega
-                  products:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        productId:
-                          type: string
-                          description: ID del producto
-                        quantity:
-                          type: integer
-                          description: Cantidad del producto
-                        price:
-                          type: number
-                          format: float
-                          description: Precio del producto
-        '404':
-          description: Orden no encontrada
+                $ref: '#/components/schemas/Product'
+        "404":
+          description: Producto no encontrado
           content:
             application/json:
               schema:
@@ -443,94 +535,59 @@ paths:
                     description: Mensaje de error
 
     put:
-      summary: Actualizar una orden existente
+      summary: Actualizar un producto existente
       tags:
-        - "Orders"
+        - "Products"
+      security:
+        - bearerAuth: []
       parameters:
-        - name: orderId
+        - name: productId
           in: path
           required: true
-          description: ID de la orden que se desea actualizar
+          description: ID del producto
           schema:
             type: string
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
-                userId:
+                productName:
                   type: string
-                  description: ID del usuario que realiza el pedido
-                paymentMethod:
+                  description: Nombre del producto
+                description:
                   type: string
-                  description: Método de pago utilizado para la orden
-                deliveryMethod:
+                  description: Descripción del producto
+                price:
+                  type: number
+                  format: float
+                  description: Precio del producto
+                stock:
+                  type: integer
+                  description: Cantidad en inventario
+                file:
                   type: string
-                  description: Método de entrega seleccionado
-                status:
+                  format: binary
+                  description: Archivo de Imagen
+                categoryId:
                   type: string
-                  description: Estado de la orden
-                products:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        description: ID del producto
-                      quantity:
-                        type: integer
-                        description: Cantidad del producto
-                      price:
-                        type: number
-                        format: float
-                        description: Precio del producto
+                  description: ID de la categoría
+              required:
+                - productName
+                - price
+                - stock
+                - categoryId
       responses:
-        '200':
-          description: Orden actualizada exitosamente
+        "200":
+          description: Producto actualizado exitosamente
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: ID de la orden
-                  userId:
-                    type: string
-                    description: ID del usuario que realizó el pedido
-                  total:
-                    type: number
-                    format: float
-                    description: Total de la orden
-                  paymentMethod:
-                    type: string
-                    description: Método de pago
-                  deliveryMethod:
-                    type: string
-                    description: Método de entrega
-                  status:
-                    type: string
-                    description: Estado de la orden
-                  products:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        productId:
-                          type: string
-                          description: ID del producto
-                        quantity:
-                          type: integer
-                          description: Cantidad del producto
-                        price:
-                          type: number
-                          format: float
-                          description: Precio del producto
-        '404':
-          description: Orden no encontrada
+                $ref: '#/components/schemas/Product'
+        "404":
+          description: Producto no encontrado
           content:
             application/json:
               schema:
@@ -541,21 +598,23 @@ paths:
                     description: Mensaje de error
 
     delete:
-      summary: Eliminar una orden
+      summary: Eliminar un producto
       tags:
-        - "Orders"
+        - "Products"
+      security:
+        - bearerAuth: []
       parameters:
-        - name: orderId
+        - name: productId
           in: path
           required: true
-          description: ID de la orden que se desea eliminar
+          description: ID del producto
           schema:
             type: string
       responses:
-        '204':
-          description: Orden eliminada exitosamente
-        '404':
-          description: Orden no encontrada
+        "204":
+          description: Producto eliminado exitosamente
+        "404":
+          description: Producto no encontrado
           content:
             application/json:
               schema:
@@ -564,85 +623,28 @@ paths:
                   message:
                     type: string
                     description: Mensaje de error
-  /products:
-    post:
-      summary: "Crear un nuevo producto"
-      tags:
-        - "Productos"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                productName:
-                  type: string
-                description:
-                  type: string
-                price:
-                  type: number
-                  format: float
-                stock:
-                  type: integer
-                categoryId:
-                  type: string
-              required:
-                - productName
-                - price
-                - stock
-                - categoryId
-      responses:
-        '201':
-          description: "Producto creado con éxito"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '400':
-          description: "Error en la creación del producto"
 
+  /products/all:
     get:
-      summary: "Obtener todos los productos"
+      summary: Obtener todos los productos
       tags:
-        - "Productos"
+        - "Products"
       responses:
-        '200':
-          description: "Lista de productos"
+        "200":
+          description: Lista de productos
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Product'
-
-  /products/{productId}:
-    parameters:
-      - name: productId
-        in: path
-        required: true
-        description: "ID del producto"
-        schema:
-          type: string
-
-    get:
-      summary: "Obtener un producto por ID"
+  /cart/add:
+    post:
+      summary: Agregar un producto al carrito de compras
       tags:
-        - "Productos"
-      responses:
-        '200':
-          description: "Producto encontrado"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '404':
-          description: "Producto no encontrado"
-
-    put:
-      summary: "Actualizar un producto existente"
-      tags:
-        - "Productos"
+        - "Cart"
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -650,34 +652,440 @@ paths:
             schema:
               type: object
               properties:
-                productName:
+                productId:
                   type: string
-                description:
-                  type: string
-                price:
-                  type: number
-                  format: float
-                stock:
+                  description: ID del producto a agregar
+                quantity:
                   type: integer
-                categoryId:
-                  type: string
+                  description: Cantidad del producto
               required:
-                - productName
-                - price
-                - stock
-                - categoryId
+                - productId
+                - quantity
       responses:
-        '200':
-          description: "Producto actualizado con éxito"
-        '404':
-          description: "Producto no encontrado"
+        "200":
+          description: Producto agregado al carrito exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Cart'
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        "400":
+          description: Error en los datos proporcionados o en el carrito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /cart/remove:
+    post:
+      summary: Remover un producto del carrito de compras
+      tags:
+        - "Cart"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                  description: ID del producto a remover
+              required:
+                - productId
+      responses:
+        "200":
+          description: Producto removido del carrito exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Cart'
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        "404":
+          description: Producto no encontrado en el carrito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          description: Error en los datos proporcionados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /cart:
+    get:
+      summary: Obtener el carrito de compras del usuario
+      tags:
+        - "Cart"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Cart obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Cart'
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        "500":
+          description: Error al obtener el carrito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /orders:
+    post:
+      summary: Crear una nueva orden
+      tags:
+        - "Order"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentMethod:
+                  type: string
+                  description: Método de pago utilizado para la orden
+                deliveryMethod:
+                  type: string
+                  description: Método de entrega seleccionado
+              required:
+                - paymentMethod
+                - deliveryMethod
+      responses:
+        "201":
+          description: Orden creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        "400":
+          description: Cart vacío o no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /orders/{orderId}:
+    get:
+      summary: Obtener una orden por ID
+      tags:
+        - "Order"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la orden
+      responses:
+        "200":
+          description: Orden encontrada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        "404":
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    put:
+      summary: Actualizar una orden existente
+      tags:
+        - "Order"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la orden a actualizar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: ID del usuario
+                paymentMethod:
+                  type: string
+                  description: Método de pago
+                deliveryMethod:
+                  type: string
+                  description: Método de entrega
+                status:
+                  type: string
+                  description: Estado de la orden
+                products:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/OrderDetail'
+              required:
+                - userId
+                - paymentMethod
+                - deliveryMethod
+      responses:
+        "200":
+          description: Orden actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+                  message:
+                    type: string
+                  status:
+                    type: integer
+        "404":
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
     delete:
-      summary: "Eliminar un producto"
+      summary: Eliminar una orden existente
       tags:
-        - "Productos"
+        - "Order"
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID de la orden a eliminar
       responses:
-        '204':
-          description: "Producto eliminado con éxito"
-        '404':
-          description: "Producto no encontrado"
+        "204":
+          description: Orden eliminada exitosamente
+        "404":
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID de categoria
+
+        categoryName:
+          type: string
+          description: Nombre de la categoria
+
+        products:
+          type: array
+          description: Array de productos asociados a la categoría (puede ser vacío o nulo)
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Product'
+          example: []
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID del producto
+        productName:
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          format: float
+          description: Precio del producto
+        stock:
+          type: integer
+          description: Cantidad en inventario
+        imageUrl:
+          type: string
+          description: URL de la imagen
+        categoryId:
+          type: string
+          description: ID de la categoría
+      required:
+        - productName
+        - price
+        - stock
+        - categoryId
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID del carrito
+        userId:
+          type: string
+          description: ID del usuario asociado
+        cartDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartDetail'
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación del carrito
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización del carrito
+
+    CartDetail:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: ID del producto en el carrito
+        quantity:
+          type: integer
+          description: Cantidad del producto en el carrito
+        price:
+          type: number
+          format: float
+          description: Precio del producto en el momento de la adición
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID de la orden
+        userId:
+          type: string
+          description: ID del usuario que realizó el pedido
+        total:
+          type: number
+          format: float
+          description: Total de la orden
+        paymentMethod:
+          type: string
+          description: Método de pago
+        deliveryMethod:
+          type: string
+          description: Método de entrega
+        status:
+          type: string
+          description: Estado de la orden
+        orderDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDetail'
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación de la orden
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización de la orden
+
+    OrderDetail:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: ID del producto en la orden
+        quantity:
+          type: integer
+          description: Cantidad del producto en la orden
+        price:
+          type: number
+          format: float
+          description: Precio del producto en el momento de la compra

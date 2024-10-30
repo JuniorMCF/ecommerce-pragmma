@@ -8,9 +8,10 @@ import { IHashService } from "../../contracts/services/ihash.service";
 import { TokenService } from "../../services/token.service";
 import { ITokenService } from "../../contracts/services/itoken.service";
 import { ServiceResult } from "../../responses/service-result.dto";
-import { User } from "../../entities/user.model";
+import { User } from "../../entities/user";
 import { SignInUserDTO } from "../../dtos/signin-user.dto";
 import { CreateUserDto } from "../../dtos/create-user.dto";
+
 
 @injectable()
 export class AuthController extends BaseController {
@@ -24,7 +25,7 @@ export class AuthController extends BaseController {
 
   public async login(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body;
-    try {
+  
       const signInUserDto = new SignInUserDTO(email, password);
       const loginResponse: ServiceResult<User> = await this.authService.signIn(
         signInUserDto
@@ -44,63 +45,55 @@ export class AuthController extends BaseController {
           loginResponse.status
         );
       }
-    } catch (error:any) {
-      throw new Error(error);
-    }
+
   }
 
   public async registerUser(req: Request, res: Response): Promise<void> {
     const { name, email, password } = req.body;
-    try {
-      const hashedPassword = await this.hashService.hash(password);
-      const createUserDto = new CreateUserDto(name, email, hashedPassword);
 
-      const registerResponse: ServiceResult<User> =
-        await this.authService.signUp(createUserDto);
+    const hashedPassword = await this.hashService.hash(password);
+    const createUserDto = new CreateUserDto(name, email, hashedPassword);
 
-      if (registerResponse.isSuccess) {
-        return this.successResponse(
-          res,
-          registerResponse.data,
-          registerResponse.message,
-          registerResponse.status
-        );
-      } else {
-        return this.errorResponse(
-          res,
-          registerResponse.message,
-          registerResponse.status
-        );
-      }
-    } catch (error: any) {
-      throw new Error(error);
+    const registerResponse: ServiceResult<User> = await this.authService.signUp(
+      createUserDto
+    );
+
+    if (registerResponse.isSuccess) {
+      return this.successResponse(
+        res,
+        registerResponse.data,
+        registerResponse.message,
+        registerResponse.status
+      );
+    } else {
+      return this.errorResponse(
+        res,
+        registerResponse.message,
+        registerResponse.status
+      );
     }
   }
 
   public async verifyToken(req: Request, res: Response): Promise<void> {
     const { token } = req.cookies;
 
-    try {
-      if (!token) return this.errorResponse(res, "Invalid token", 401);
+    if (!token) return this.errorResponse(res, "Invalid token", 401);
 
-      const isTokenValid = await this.tokenService.verifyToken(token);
+    const user = await this.tokenService.verifyToken(token);
 
-      if (!isTokenValid)
-        return this.errorResponse(res, "User not found, unauthorized", 401);
+    if (!user)
+      return this.errorResponse(res, "User not unauthorized", 401);
 
-      return this.successResponse(res, null, "Token valid", 200);
-    } catch (error: any) {
-      throw new Error(error);
-    }
+    return this.successResponse(res, user, "Token valid", 200);
   }
 
   public async logout(req: Request, res: Response): Promise<void> {
-    try {
-      res.clearCookie("token");
+    const isCookieDeleted = res.clearCookie("token");
 
-      return this.successResponse(res, null, "Logout successful", 200);
-    } catch (error: any) {
-      throw new Error(error);
+    if (!isCookieDeleted) {
+      return this.errorResponse(res, "Token not found", 404);
     }
+
+    return this.successResponse(res, null, "Logout successful", 200);
   }
 }
