@@ -1,48 +1,42 @@
 # PRAGMMA E-Commerce API
 
-Este proyecto es una API desarrollada en **Node.js** utilizando **TypeScript** para un sistema de e-commerce
+Este proyecto es una API desarrollada en **Node.js** utilizando **TypeScript** para un sistema de e-commerce.
 
 ## Descripción del Proyecto 📋
 
-El proyecto consiste en desarrollar una API utilizando NodeJS con Express y MongoDB como base de datos NoSQL, tambien incluye SocketIO para las notificaciones en tiempo real. Esta aplicación permite a los usuarios seleccionar productos para su carrito de compras, autenticarse y enviar una orden al administrador el cual puede gestionar los productos que el cliente podra ver en la web.
+La **PRAGMMA E-Commerce API** es una solución robusta diseñada para gestionar un sistema de comercio electrónico. Utilizando **Node.js** con **Express** y **MongoDB** como base de datos NoSQL, la API proporciona una interfaz para que los usuarios seleccionen productos, gestionen su carrito de compras, se autentiquen y realicen pedidos. Además, incluye **Socket.IO** para notificaciones en tiempo real, mejorando la interactividad y la experiencia del usuario.
 
-## 📚 Funcionalidades
+## Funcionalidades 📦
 
 1. **Gestión de Categorías**
-
-   - Crear, actualizar, eliminar y listar categorías para organizar productos.
+   - Crear, actualizar, eliminar y listar categorías para organizar los productos de manera eficiente.
 
 2. **Gestión de Productos**
-
-   - Crear, actualizar, eliminar y listar productos, con filtros y búsqueda avanzada.
+   - Crear, actualizar, eliminar y listar productos, incluyendo capacidades de filtrado y búsqueda avanzada.
 
 3. **Gestión de Usuarios**
-
-   - Registro de usuarios, autenticación JWT, gestión de perfil y recuperación de contraseñas.
+   - Registro de nuevos usuarios, autenticación mediante JWT, gestión de perfiles y recuperación de contraseñas.
 
 4. **Gestión de Órdenes**
-
-   - Crear órdenes de compra, actualizar estado, ver historial y cancelar órdenes.
+   - Crear órdenes de compra, actualizar su estado, visualizar el historial de órdenes y cancelar pedidos.
 
 5. **Gestión de Carrito de Compras**
-   - Agregar, actualizar, visualizar y vaciar el carrito de compras.
-
+   - Agregar, actualizar, visualizar y vaciar el carrito de compras, proporcionando una experiencia de compra intuitiva.
 
 ## 🚀 Instrucciones para Ejecutar el Proyecto
 
 1. **Clonar el Repositorio**
-   - Clona el proyecto desde GitHub usando el siguiente comando:
+   - Clona el proyecto desde GitHub:
      ```bash
      git clone https://github.com/JuniorMCF/ecommerce-pragmma.git
      ```
 
 2. **Abrir el Proyecto en tu IDE Favorito**
-   - Navega al directorio del proyecto y ábrelo con el IDE de tu preferencia.
+   - Navega al directorio del proyecto y ábrelo en tu IDE preferido.
 
 3. **Crear una Instancia de MongoDB en Atlas**
-   - Dirígete a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) y crea una cuenta o inicia sesión.
-   - Crea un nuevo **Cluster** gratuito.
-   - Configura tu base de datos y luego haz clic en **Connect** para obtener la URI de conexión.
+   - Visita [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) y crea una cuenta o inicia sesión.
+   - Crea un nuevo **Cluster** gratuito y configura tu base de datos.
    - Añade tu dirección IP actual a la lista de IP permitidas y crea un usuario de base de datos con permisos de lectura y escritura.
    - Copia la URI de conexión. Debería verse similar a:
      ```
@@ -50,7 +44,7 @@ El proyecto consiste en desarrollar una API utilizando NodeJS con Express y Mong
      ```
 
 4. **Configurar Variables de Entorno**
-   - Crea un archivo `.env` en la raíz del proyecto y define las variables de entorno requeridas:
+   - Crea un archivo `.env` en la raíz del proyecto y define las variables necesarias:
      ```env
      NODE_ENV=development
      SERVER_PORT=3000
@@ -63,7 +57,6 @@ El proyecto consiste en desarrollar una API utilizando NodeJS con Express y Mong
      LOCAL_STORAGE_PATH=./uploads
      MAX_FILE_SIZE_MB=5
 
-
      AWS_BUCKET_NAME=
      AWS_REGION=us-east-1
      AWS_ACCESS_KEY_ID=
@@ -71,73 +64,69 @@ El proyecto consiste en desarrollar una API utilizando NodeJS con Express y Mong
      ```
 
 5. **Instalar Dependencias**
-   - Instala las dependencias listadas en `package.json` con el siguiente comando:
+   - Instala las dependencias del proyecto:
      ```bash
      npm install
      ```
-   - Si estás utilizando Yarn, puedes instalar las dependencias con:
+   - O si usas Yarn:
      ```bash
      yarn install
      ```
 
 6. **Ejecutar el Proyecto en Desarrollo**
-   - Inicia el servidor en modo desarrollo con TypeScript:
+   - Inicia el servidor en modo desarrollo:
      ```bash
      npm run dev
      ```
 
 7. **Compilar y Ejecutar en Producción**
-   - Para compilar el proyecto a JavaScript y ejecutarlo en producción:
+   - Para compilar el proyecto y ejecutarlo en producción:
      ```bash
      npm run build
      npm start
      ```
 
-¡Listo! Ahora tu API debería estar funcionando en el puerto especificado (por defecto, `http://localhost:3000`).
-
+Tu API debería estar funcionando en `http://localhost:3000`.
 
 ## 📘 Conceptos Aplicados
 
-En el proyecto se implementaron los siguientes conceptos clave:
+El proyecto implementa los siguientes conceptos clave:
 
 1. **Endpoints CRUD**
-   - Definición de endpoints para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre las entidades principales, como *Categories*, *Products*, *Users* y *Orders*, que permiten gestionar las operaciones básicas del e-commerce.
+   - CRUD (Crear, Leer, Actualizar, Eliminar) para *Categories*, *Products*, *Users*, y *Orders*.
 
 2. **Autenticación y Autorización**
-   - Implementación de autenticación y autorización mediante **JSON Web Tokens (JWT)**. Los servicios especializados gestionan la creación y verificación de tokens, proporcionando acceso seguro y controlado a los recursos de la API.
+   - Uso de **JSON Web Tokens (JWT)** para autenticar y autorizar usuarios.
 
 3. **Hashing de Contraseña**
-   - Uso de hashing seguro para almacenar contraseñas en la base de datos, protegiendo la información del usuario contra accesos no autorizados mediante algoritmos de hash que garantizan la integridad y seguridad de las contraseñas.
+   - Hashing seguro de contraseñas para proteger la información del usuario.
 
 4. **Validación de Datos**
-   - Validación de datos realizada con **Express Validator**, establecida como middleware en cada ruta respectiva. Esta librería permite validar y sanitizar datos de entrada de manera flexible, asegurando que las solicitudes cumplen con los requisitos establecidos.
+   - Validación de datos con **Express Validator**.
 
 5. **Inyección de Dependencias**
-   - Uso de **Inversify** para gestionar la inyección de dependencias en la aplicación, facilitando la modularidad y escalabilidad del proyecto.
+   - Uso de **Inversify** para gestionar dependencias y mejorar la modularidad.
 
 6. **WebSockets**
-   - Integración de WebSockets para emitir eventos en tiempo real, como la creación de una orden, permitiendo actualizaciones en vivo y una mejor experiencia de usuario.
+   - Integración de WebSockets para notificaciones en tiempo real.
 
-7. **DTO (Data Transfer Objects) y Entidades**
-   - Uso de **DTOs y entidades** para estructurar y organizar las solicitudes y respuestas de manera clara, permitiendo un flujo de datos consistente entre las diferentes capas del sistema.
+7. **DTOs y Entidades**
+   - Uso de **DTOs y entidades** para un flujo de datos organizado.
 
 8. **Contracts**
-   - Definición de interfaces en la capa de **Contracts** para los servicios y repositorios, promoviendo el desacoplamiento de la lógica del negocio y facilitando la testabilidad del código.
+   - Definición de interfaces para servicios y repositorios.
 
 9. **Repositorios**
-   - Implementación de una capa de repositorios que maneja la lógica de acceso a datos, permitiendo que la interacción con la base de datos esté desacoplada de la lógica de negocio.
+   - Capa de repositorios para manejar la lógica de acceso a datos.
 
 10. **Middlewares**
-    - **Middleware de Autenticación**: Controla el acceso a los endpoints según los permisos de cada usuario.
-    - **Middleware para Manejo de Errores**: Proporciona una gestión centralizada de errores, mejorando la experiencia del usuario y facilitando el manejo de excepciones.
+    - Middleware para autenticación y manejo de errores.
 
 11. **Servicios de Token**
-    - Servicios dedicados para la creación y verificación de **tokens JWT**, asegurando la autenticidad y validez de cada sesión y permitiendo un acceso seguro a la API.
+    - Servicios dedicados para la gestión de tokens JWT.
 
 12. **Documentación con Swagger**
-    - Configuración de **Swagger** para documentar la API, facilitando a otros desarrolladores la comprensión y uso de los endpoints disponibles en el sistema.
-
-
+    - Configuración de **Swagger** para documentar la API.
 
 ## 👩🏻‍💻 Autores
 
