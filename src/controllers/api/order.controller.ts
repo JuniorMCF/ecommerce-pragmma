@@ -23,11 +23,11 @@ export class OrderController extends BaseController {
 
   // Crear una nueva orden
   public async createOrder(req: Request, res: Response): Promise<void> {
-    const userId = res.locals.userId; // Obtener el userId desde el middleware de autenticación
+    const { id } = req.body.user;// Obtener el userId desde el middleware de autenticación
     const { paymentMethod, deliveryMethod } = req.body;
 
     // Obtener el carrito del usuario
-    const cartResult: ServiceResult<Cart> = await this.cartService.getCart(userId);
+    const cartResult: ServiceResult<Cart> = await this.cartService.getCart(id);
 
     if (!cartResult.isSuccess || !cartResult.data || cartResult.data.cartDetails.length === 0) {
       return this.errorResponse(res, "Cart is empty or could not be retrieved", 400);
@@ -35,7 +35,7 @@ export class OrderController extends BaseController {
 
     // Crear el DTO de la orden con los datos del carrito
     const orderDTO = new CreateOrderDTO(
-      userId,
+      id,
       paymentMethod,
       deliveryMethod,
       cartResult.data.cartDetails as ProductOrder[]
@@ -49,7 +49,7 @@ export class OrderController extends BaseController {
     }
 
     // Limpiar el carrito después de crear la orden
-    await this.cartService.clearCart(userId);
+    await this.cartService.clearCart(id);
 
     return this.successResponse(res, response.data, response.message, response.status);
   }

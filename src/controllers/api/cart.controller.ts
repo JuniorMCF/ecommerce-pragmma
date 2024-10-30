@@ -12,11 +12,11 @@ export class CartController extends BaseController {
   }
 
   public async addToCart(req: Request, res: Response): Promise<void> {
-    const { userId } = req.body.user;
+    const { id } = req.body.user;
     const { productId, quantity } = req.body;
 
     const result: ServiceResult<Cart> = await this.cartService.addToCart(
-      userId,
+      id,
       productId,
       quantity
     );
@@ -33,9 +33,9 @@ export class CartController extends BaseController {
   }
 
   public async getCart(req: Request, res: Response): Promise<void> {
-    const { userId } = req.body.user;
+    const { id } = req.body.user;
 
-    const result: ServiceResult<Cart> = await this.cartService.getCart(userId);
+    const result: ServiceResult<Cart> = await this.cartService.getCart(id);
 
     if(!result.isSuccess){
       return this.errorResponse(res,result.message,result.status)
@@ -50,11 +50,11 @@ export class CartController extends BaseController {
   }
 
   public async removeFromCart(req: Request, res: Response): Promise<void> {
-    const { userId } = req.body.user;
+    const { id } = req.body.user;
     const { productId } = req.body;
 
     const result: ServiceResult<Cart> = await this.cartService.removeFromCart(
-      userId,
+      id,
       productId
     );
 

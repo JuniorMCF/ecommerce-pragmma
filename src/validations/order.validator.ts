@@ -7,14 +7,7 @@ export class OrderValidator {
     res: Response,
     next: NextFunction
   ): Promise<any> {
-    await body("userId")
-      .exists()
-      .withMessage("User ID is required.")
-      .isString()
-      .withMessage("User ID must be a string.")
-      .trim()
-      .notEmpty()
-      .withMessage("User ID cannot be empty."),
+   
     await  body("paymentMethod")
       .exists()
       .withMessage("Payment method is required.")
@@ -22,7 +15,8 @@ export class OrderValidator {
       .withMessage("Payment method must be a string.")
       .trim()
       .notEmpty()
-      .withMessage("Payment method cannot be empty."),
+      .withMessage("Payment method cannot be empty.")
+      .run(req)
     await body("deliveryMethod")
       .exists()
       .withMessage("Delivery method is required.")
@@ -30,15 +24,9 @@ export class OrderValidator {
       .withMessage("Delivery method must be a string.")
       .trim()
       .notEmpty()
-      .withMessage("Delivery method cannot be empty."),
-    await body("products")
-      .exists()
-      .withMessage("Products are required.")
-      .isArray()
-      .withMessage("Products must be an array.")
-      .notEmpty()
-      .withMessage("Products cannot be empty.")
-      .run(req);
+      .withMessage("Delivery method cannot be empty.")
+      .run(req)
+   
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

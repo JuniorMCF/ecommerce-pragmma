@@ -3,6 +3,7 @@ import { IOrderRepository } from "../contracts/repositories/iorder.repository";
 import { Order } from "../entities/order";
 import { ObjectId, Db } from "mongodb";
 import { Server as SocketIOServer } from "socket.io";
+import { OrderDetail } from "../entities/order-detail";
 
 @injectable()
 export class OrderRepository implements IOrderRepository {
@@ -15,27 +16,44 @@ export class OrderRepository implements IOrderRepository {
     this.collection = this.db.collection("orders");
   }
 
-
   async create(order: Order): Promise<Order> {
+    // Crear la orden principal
     const newOrder = {
       userId: order.userId,
       total: order.total,
       paymentMethod: order.paymentMethod,
       deliveryMethod: order.deliveryMethod,
-      orderDetails: order.orderDetails,
       status: order.status,
       createdAt: new Date(),
+      orderDetails: order.orderDetails.map((detail) => ({
+        ...detail,
+        salesOrderId: undefined, // Esto será asignado más tarde
+      })),
     };
 
+    // Insertar la orden principal
     const result = await this.collection.insertOne(newOrder);
 
+    // Ahora asigna el salesOrderId a cada OrderDetail
+    const orderDetailsWithSalesOrderId = newOrder.orderDetails.map((detail) => {
+      return {
+        ...detail,
+        salesOrderId: result.insertedId.toString(), // Asignar el ID de la orden creada
+      };
+    });
 
-    
+    // Actualizar la orden creada con los detalles de la orden
     const createdOrder = new Order({
       ...newOrder,
       id: result.insertedId.toString(),
+      orderDetails: orderDetailsWithSalesOrderId, // Actualiza la propiedad orderDetails
     });
 
+    // Actualizar el documento en la colección para incluir los salesOrderId
+    await this.collection.updateOne(
+      { _id: result.insertedId },
+      { $set: { orderDetails: orderDetailsWithSalesOrderId } }
+    );
 
     this.io.emit("CreateOrder", createdOrder);
 

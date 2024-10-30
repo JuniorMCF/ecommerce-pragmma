@@ -33,7 +33,9 @@ export class CartService implements ICartService {
       userId,
       productId,
       quantity,
-      product.price
+      product.price,
+      product.productName,
+      product.description
     );
 
     if (!updatedCart) {
@@ -76,7 +78,7 @@ export class CartService implements ICartService {
     return ServiceResult.failure<Cart>(
       "Error retrieving cart",
       "GET_CART_ERROR",
-      500
+      404
     );
   }
 

@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { Db, ObjectId } from "mongodb";
+import { Db, ObjectId, UpdateFilter } from "mongodb";
 import { ICartRepository } from "../contracts/repositories/icart.repository";
 import { Cart } from "../entities/cart";
 import { CartDetail } from "../entities/cart-detail";
@@ -12,93 +12,146 @@ export class CartRepository implements ICartRepository {
     this.collection = this.db.collection("carts");
   }
 
-
   async addToCart(
     userId: string,
     productId: string,
     quantity: number,
-    price: number
+    price: number,
+    productName: string, // Nuevo parámetro
+    productDescription: string // Nuevo parámetro
   ): Promise<Cart | undefined> {
-    const filter = { userId };
-
-    const update: any = {
-      $setOnInsert: { createdAt: new Date(), userId },
-      $set: { updatedAt: new Date() },
-      $push: {
-        cartDetails: {
-          productId,
-          quantity,
-          price,
-        } as any,
+    // Primero, intenta actualizar la cantidad si el producto ya existe en `cartDetails`
+    const updateExistingProduct: UpdateFilter<any> = {
+      $set: {
+        updatedAt: new Date(),
+        "cartDetails.$[elem].quantity": quantity, // Actualiza la cantidad directamente
       },
     };
 
-    const options = { upsert: true, returnDocument: "after" as const };
+    const options = {
+      arrayFilters: [{ "elem.productId": productId }],
+      returnDocument: "after" as const,
+    };
+
     const result = await this.collection.findOneAndUpdate(
-      filter,
-      update,
+      { userId, "cartDetails.productId": productId },
+      updateExistingProduct,
       options
     );
 
-    if (!result || !result.value) return undefined;
+    // Si la cantidad es 0, elimina el producto del carrito
+    if (quantity === 0 && result) {
+      const removeProduct: UpdateFilter<any> = {
+        $set: { updatedAt: new Date() },
+        $pull: { cartDetails: { productId } } as any, // Elimina el producto del carrito
+      };
 
-    const cart = new Cart({
-      id: result.value._id.toString(),
-      userId: result.value.userId,
-      createdAt: result.value.createdAt,
-      updatedAt: result.value.updatedAt,
-      cartDetails: (result.value.cartDetails || []).map(
-        (item: any) =>
-          new CartDetail({
-            id: item._id?.toString(),
-            cartId: result.value._id.toString(),
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price,
-          })
-      ),
-    });
+      await this.collection.findOneAndUpdate({ userId }, removeProduct, {
+        returnDocument: "after" as const,
+      });
 
-    return cart;
+      // Retornamos el carrito actualizado
+      const updatedCart = await this.collection.findOne({ userId });
+      if (!updatedCart) return undefined;
+
+      return {
+        id: updatedCart._id.toString(),
+        userId: updatedCart.userId,
+        createdAt: updatedCart.createdAt,
+        updatedAt: updatedCart.updatedAt,
+        cartDetails: (updatedCart.cartDetails || []).map((item: any) => ({
+          id: item._id?.toString(),
+          cartId: updatedCart._id.toString(),
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price,
+          productName: item.productName, // Agrega el nombre del producto
+          productDescription: item.productDescription, // Agrega la descripción del producto
+        })),
+      };
+    }
+
+    // Si no se encontró el producto en `cartDetails`, lo añade como nuevo
+    if (!result) {
+      const addNewProduct: UpdateFilter<any> = {
+        $setOnInsert: { createdAt: new Date(), userId },
+        $set: { updatedAt: new Date() },
+        $push: {
+          cartDetails: {
+            productId,
+            quantity,
+            price,
+            productName, // Agrega el nombre del producto
+            productDescription, // Agrega la descripción del producto
+          } as any,
+        },
+      };
+
+      await this.collection.findOneAndUpdate({ userId }, addNewProduct, {
+        upsert: true,
+        returnDocument: "after" as const,
+      });
+    }
+
+    // Retornamos el carrito actualizado
+    const updatedCart = await this.collection.findOne({ userId });
+    if (!updatedCart) return undefined;
+
+    return {
+      id: updatedCart._id.toString(),
+      userId: updatedCart.userId,
+      createdAt: updatedCart.createdAt,
+      updatedAt: updatedCart.updatedAt,
+      cartDetails: (updatedCart.cartDetails || []).map((item: any) => ({
+        id: item._id?.toString(),
+        cartId: updatedCart._id.toString(),
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+        productName: item.productName, // Incluye el nombre del producto
+        productDescription: item.productDescription, // Incluye la descripción del producto
+      })),
+    };
   }
 
   async removeFromCart(
     userId: string,
     productId: string
   ): Promise<Cart | undefined> {
-    const filter = { userId };
-    const update: any = {
-      $set: { updatedAt: new Date() },
-      $pull: { cartDetails: { productId } }, // Remove the product entirely from cartDetails
-    };
-    const options = { returnDocument: "after" as const };
 
-    const result = await this.collection.findOneAndUpdate(
-      filter,
-      update,
-      options
+
+    // Check if the cart exists for the user
+    const cart = await this.collection.findOne({ userId });
+    //console.log("Retrieved cart:", cart);
+
+    if (!cart) {
+      
+      return undefined; // If the cart does not exist, return undefined
+    }
+
+    // Check if the product exists in the cart
+    const productExists = cart.cartDetails.some(
+      (item: any) => item.productId === productId
     );
 
-    if (!result || !result.value) return undefined;
+    if (!productExists) {
+     
+      return undefined; // If the product is not found, return undefined
+    }
 
-    const cart = new Cart({
-      id: result.value._id.toString(),
-      userId: result.value.userId,
-      createdAt: result.value.createdAt,
-      updatedAt: result.value.updatedAt,
-      cartDetails: (result.value.cartDetails || []).map(
-        (item: any) =>
-          new CartDetail({
-            id: item._id?.toString(),
-            cartId: result.value._id.toString(),
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price,
-          })
-      ),
+    // Proceed to remove the product
+    const update: any = {
+      $set: { updatedAt: new Date() },
+      $pull: { cartDetails: { productId } }, // Remove the product from the cart
+    };
+
+    await this.collection.findOneAndUpdate({ userId }, update, {
+      returnDocument: "after" as const,
     });
 
-    return cart;
+   
+
+    return this.getCart(userId);
   }
 
   async getCart(userId: string): Promise<Cart | undefined> {
@@ -119,6 +172,8 @@ export class CartRepository implements ICartRepository {
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
+            productName: item.productName,
+            productDescription: item.productDescription,
           })
       ),
     });
