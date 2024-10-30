@@ -376,7 +376,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Category'
+                  $ref: "#/components/schemas/Category"
 
   /categories/{categoryId}/products:
     get:
@@ -392,7 +392,7 @@ paths:
             type: string
           description: ID of the category to retrieve products for
       responses:
-        '200':
+        "200":
           description: Successful response with category and associated products
           content:
             application/json:
@@ -416,15 +416,22 @@ paths:
                           type: string
                           description: Product ID
                           example: "64c6a2f34e5f13f57d0b2f68"
-                        name:
+                        productName:
                           type: string
                           description: Name of the product
                           example: "Smartphone"
+                        description:
+                          type: string
+                          description: Descripción del product
+                        stock:
+                          type: number
+                          description: stock del producto
+                          example: 100
                         price:
                           type: number
                           description: Price of the product
                           example: 299.99
-        '404':
+        "404":
           description: Category or products not found
           content:
             application/json:
@@ -434,7 +441,7 @@ paths:
                   message:
                     type: string
                     example: "Category not found"
-        '500':
+        "500":
           description: Server error
           content:
             application/json:
@@ -478,7 +485,7 @@ paths:
                 categoryId:
                   type: string
                   description: ID de la categoría
-                
+
               required:
                 - productName
                 - description
@@ -492,7 +499,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: "#/components/schemas/Product"
         "400":
           description: Error al crear el producto
           content:
@@ -522,7 +529,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: "#/components/schemas/Product"
         "404":
           description: Producto no encontrado
           content:
@@ -585,7 +592,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
+                $ref: "#/components/schemas/Product"
         "404":
           description: Producto no encontrado
           content:
@@ -637,7 +644,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
+                  $ref: "#/components/schemas/Product"
   /cart/add:
     post:
       summary: Agregar un producto al carrito de compras
@@ -670,7 +677,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Cart'
+                    $ref: "#/components/schemas/Cart"
                   message:
                     type: string
                   status:
@@ -722,7 +729,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Cart'
+                    $ref: "#/components/schemas/Cart"
                   message:
                     type: string
                   status:
@@ -762,7 +769,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Cart'
+                    $ref: "#/components/schemas/Cart"
                   message:
                     type: string
                   status:
@@ -780,7 +787,7 @@ paths:
     post:
       summary: Crear una nueva orden
       tags:
-        - "Order"
+        - Order
       security:
         - bearerAuth: []
       requestBody:
@@ -808,7 +815,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Order'
+                    $ref: "#/components/schemas/Order"
                   message:
                     type: string
                   status:
@@ -827,7 +834,7 @@ paths:
     get:
       summary: Obtener una orden por ID
       tags:
-        - "Order"
+        - Order
       security:
         - bearerAuth: []
       parameters:
@@ -846,7 +853,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Order'
+                    $ref: "#/components/schemas/Order"
                   message:
                     type: string
                   status:
@@ -864,7 +871,7 @@ paths:
     put:
       summary: Actualizar una orden existente
       tags:
-        - "Order"
+        - Order
       security:
         - bearerAuth: []
       parameters:
@@ -896,7 +903,7 @@ paths:
                 products:
                   type: array
                   items:
-                    $ref: '#/components/schemas/OrderDetail'
+                    $ref: "#/components/schemas/OrderDetail"
               required:
                 - userId
                 - paymentMethod
@@ -910,7 +917,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Order'
+                    $ref: "#/components/schemas/Order"
                   message:
                     type: string
                   status:
@@ -928,7 +935,7 @@ paths:
     delete:
       summary: Eliminar una orden existente
       tags:
-        - "Order"
+        - Order
       security:
         - bearerAuth: []
       parameters:
@@ -974,7 +981,7 @@ components:
           description: Array de productos asociados a la categoría (puede ser vacío o nulo)
           nullable: true
           items:
-            $ref: '#/components/schemas/Product'
+            $ref: "#/components/schemas/Product"
           example: []
     Product:
       type: object
@@ -1018,7 +1025,7 @@ components:
         cartDetails:
           type: array
           items:
-            $ref: '#/components/schemas/CartDetail'
+            $ref: "#/components/schemas/CartDetail"
         createdAt:
           type: string
           format: date-time
@@ -1034,6 +1041,12 @@ components:
         productId:
           type: string
           description: ID del producto en el carrito
+        productName:
+          type: string
+          description: Nombre del producto
+        productDescription:
+          type: string
+          description: Descripción del producto
         quantity:
           type: integer
           description: Cantidad del producto en el carrito
@@ -1066,7 +1079,7 @@ components:
         orderDetails:
           type: array
           items:
-            $ref: '#/components/schemas/OrderDetail'
+            $ref: "#/components/schemas/OrderDetail"
         createdAt:
           type: string
           format: date-time
