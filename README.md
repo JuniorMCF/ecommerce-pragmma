@@ -9,19 +9,19 @@ La **PRAGMMA E-Commerce API** es una solución robusta diseñada para gestionar 
 ## Funcionalidades 📦
 
 1. **Gestión de Categorías**
-   - Crear, actualizar, eliminar y listar categorías para organizar los productos de manera eficiente.
+   - Crear, actualizar, eliminar y listar categorías para organizar los productos.
 
 2. **Gestión de Productos**
-   - Crear, actualizar, eliminar y listar productos, incluyendo capacidades de filtrado y búsqueda avanzada.
+   - Crear, actualizar, eliminar y listar productos.
 
 3. **Gestión de Usuarios**
-   - Registro de nuevos usuarios, autenticación mediante JWT, gestión de perfiles y recuperación de contraseñas.
+   - Registro de nuevos usuarios, autenticación mediante JWT.
 
 4. **Gestión de Órdenes**
    - Crear órdenes de compra, actualizar su estado, visualizar el historial de órdenes y cancelar pedidos.
 
 5. **Gestión de Carrito de Compras**
-   - Agregar, actualizar, visualizar y vaciar el carrito de compras, proporcionando una experiencia de compra intuitiva.
+   - Agregar, actualizar, visualizar y vaciar el carrito de compras.
 
 ## 🚀 Instrucciones para Ejecutar el Proyecto
 
